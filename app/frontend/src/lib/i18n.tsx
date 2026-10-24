@@ -1,0 +1,429 @@
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+
+export type Lang = 'en' | 'zh';
+
+const en = {
+  'brand.tag': 'Honest leaderboards from your evaluation results',
+  'nav.new': 'New board',
+  'nav.home': 'Home',
+  'lang.label': 'Interface language',
+
+  'home.eyebrow': 'Free template for evaluation reports',
+  'home.title': 'Publish evaluation results the way a careful reviewer would read them.',
+  'home.lead':
+    'Paste JSON or CSV, or fill a table. IndexBoard draws one chart per metric with 95% intervals, finds the cost frontier, and says so plainly when the order at the top is not meaningful.',
+  'home.create': 'Create a board',
+  'home.example': 'Start from the example',
+  'home.previewCaption': 'Example data. Bars are means; whiskers are 95% intervals.',
+  'home.f1.t': 'Intervals, not just ranks',
+  'home.f1.d': 'Every bar carries its 95% interval. Overlapping leaders are reported as a statistical tie.',
+  'home.f2.t': 'Score against cost',
+  'home.f2.d': 'A scatter of score versus cost with a dashed line through the models nobody beats on both.',
+  'home.f3.t': 'Method on the page',
+  'home.f3.d': 'Your formula, a worked example and the list of what was held fixed sit next to the results.',
+  'home.f4.t': 'Share without accounts',
+  'home.f4.d': 'Each board gets a read-only public link and a private edit key. No login required.',
+  'home.open.t': 'Already have a board?',
+  'home.open.d': 'Paste a share link or board code to open it.',
+  'home.open.placeholder': 'https://…/b/abc123 or abc123',
+  'home.open.go': 'Open',
+
+  'ed.newTitle': 'New board',
+  'ed.editTitle': 'Edit board',
+  'ed.loadExample': 'Load example',
+  'ed.reset': 'Clear',
+  'ed.preview': 'Preview',
+  'ed.backToEdit': 'Back to editing',
+  'ed.publish': 'Publish board',
+  'ed.saveChanges': 'Save changes',
+  'ed.saving': 'Saving…',
+  'ed.basics': 'Basics',
+  'ed.title': 'Title',
+  'ed.titlePh': 'e.g. Retrieval QA benchmark, October 2026',
+  'ed.description': 'Description',
+  'ed.descriptionPh': 'What was evaluated, on which data, and why.',
+  'ed.data': 'Results',
+  'ed.dataHint': 'Items are the things you compare (models, tools, methods). Intervals are optional but strongly recommended.',
+  'ed.tab.table': 'Table',
+  'ed.tab.json': 'Paste JSON',
+  'ed.tab.csv': 'Paste CSV',
+  'ed.addMetric': 'Add metric',
+  'ed.addItem': 'Add item',
+  'ed.item': 'Item',
+  'ed.itemPh': 'Model name',
+  'ed.metricName': 'Metric name',
+  'ed.unit': 'Unit',
+  'ed.removeMetric': 'Remove metric {name}',
+  'ed.removeItem': 'Remove item {name}',
+  'ed.value': 'Score',
+  'ed.low': '95% low',
+  'ed.high': '95% high',
+  'ed.runs': 'Runs',
+  'ed.dir.higher': 'Higher is better',
+  'ed.dir.lower': 'Lower is better',
+  'ed.import': 'Import and replace table',
+  'ed.imported': 'Imported {items} items and {metrics} metrics.',
+  'ed.jsonHelp':
+    'Accepts the format IndexBoard exports, or {"metrics": [...], "items": [{"name": "...", "scores": {"Accuracy": {"value": 78.4, "low": 75.9, "high": 80.8, "runs": 5}}}]}. Plain numbers work too.',
+  'ed.csvHelp':
+    'First column is the item name. Each metric column may be followed by "<metric> low", "<metric> high" and "<metric> runs" columns. Units in brackets, e.g. "Cost (CNY)".',
+  'ed.roles': 'Chart roles',
+  'ed.primary': 'Headline metric',
+  'ed.primaryHint': 'Used for the top banner and the vertical axis of the scatter plot.',
+  'ed.cost': 'Cost metric',
+  'ed.costHint': 'Horizontal axis of the scatter plot. Lower is treated as better.',
+  'ed.costNone': 'No cost metric',
+  'ed.auto': 'Automatic',
+  'ed.method': 'Methodology',
+  'ed.formula': 'Formula and scoring',
+  'ed.formulaPh': 'Markdown supported. Explain how each score and interval is computed.',
+  'ed.worked': 'Worked example',
+  'ed.workedPh': 'Walk through one item from raw counts to the reported number.',
+  'ed.fixed': 'What is held fixed',
+  'ed.fixedPh': 'One item per line, e.g. Same prompt template',
+  'ed.markdownHint': 'Markdown: **bold**, `code`, lists, links.',
+  'ed.fixIssues': 'Fix these before publishing',
+  'ed.publishedTitle': 'Board published',
+  'ed.publishedDesc': 'Keep the edit key somewhere safe. Anyone with it can change this board, and it cannot be recovered.',
+  'ed.shareLink': 'Public share link (read only)',
+  'ed.editKey': 'Edit key',
+  'ed.openBoard': 'Open board',
+  'ed.keyStored': 'This browser also remembers the key for this board.',
+  'ed.unsaved': 'Preview of unsaved changes',
+
+  'key.title': 'Enter the edit key',
+  'key.desc': 'Only the owner of this board can edit it. Paste the edit key you received when it was published.',
+  'key.ph': 'Edit key',
+  'key.submit': 'Unlock editing',
+  'key.wrong': 'That edit key does not match this board.',
+
+  'b.loading': 'Loading board…',
+  'b.notFound': 'Board not found',
+  'b.notFoundDesc': 'The link may be mistyped, or the board was never published.',
+  'b.loadError': 'Could not load this board.',
+  'b.retry': 'Retry',
+  'b.updated': 'Updated {date}',
+  'b.readOnly': 'Read only',
+  'b.edit': 'Edit',
+  'b.copyLink': 'Copy link',
+  'b.print': 'Print view',
+  'b.downloadJson': 'Download JSON',
+  'b.linkCopied': 'Share link copied',
+  'b.copyFailed': 'Copy failed. Select the text and copy it manually.',
+  'b.tab.index': 'Index',
+  'b.tab.models': 'Models',
+  'b.tab.method': 'Methodology',
+  'b.tile.items': 'Items compared',
+  'b.tile.metrics': 'Metrics',
+  'b.tile.top': 'Top on {metric}',
+  'b.tile.tie': 'Tie: {n} items',
+  'b.tile.runs': 'Runs per item',
+  'b.tile.runsNone': 'Not reported',
+  'b.tile.frontier': 'On the cost frontier',
+
+  'st.tie.t': 'Statistical tie at the top',
+  'st.tie.d': "On {metric}, the 95% intervals of {names} overlap with the leader's. The order between them is not meaningful.",
+  'st.lead.t': 'Clear lead on {metric}',
+  'st.lead.d': "{name}'s 95% interval does not overlap any other item's. The top position is supported by the data.",
+  'st.none.t': 'No intervals reported',
+  'st.none.d': 'Without 95% intervals, differences on {metric} may be noise. Treat the order as provisional.',
+  'note.tie': 'Tie at the top: {names}. Order between them is not meaningful.',
+  'note.lead': 'The leader is separated from the rest.',
+  'note.none': 'No interval for the leader; order is provisional.',
+  'note.missing': 'No score: {names}.',
+  'chart.higher': 'Higher is better',
+  'chart.lower': 'Lower is better',
+  'chart.copyPng': 'Copy PNG',
+  'chart.pngCopied': 'Chart copied as PNG',
+  'chart.pngDownloaded': 'Clipboard unavailable, PNG downloaded instead',
+  'chart.pngFailed': 'Could not create the PNG',
+  'chart.scatter': '{score} vs {cost}',
+  'chart.scatterNote': 'The dashed line joins items that no other item beats on both {score} and {cost}. Up and to the left is better.',
+  'chart.scatterNoteLower': 'The dashed line joins items that no other item beats on both {score} and {cost}. Down and to the left is better.',
+  'chart.frontier': 'Nobody beats',
+  'chart.log': 'log scale',
+  'chart.noCost': 'Choose a cost metric in the editor to see the score versus cost plot.',
+  'chart.scatterEmpty': 'Not enough items have both scores to plot.',
+  'chart.tied': 'tied',
+  'chart.legendLead': 'Leader or tied with it',
+  'chart.legendOther': 'Others',
+  'chart.legendCi': '95% interval',
+
+  'm.rank': 'Rank',
+  'm.item': 'Item',
+  'm.sortBy': 'Sort by {name}',
+  'm.note': 'Sorted by {metric}. A "tied" marker means the 95% interval overlaps the leader on that metric, so ranks among tied items are not meaningful.',
+  'm.runs': '{n} runs',
+
+  'meth.formula': 'How scores are computed',
+  'meth.worked': 'Worked example',
+  'meth.fixed': 'What is held fixed',
+  'meth.metrics': 'Metrics on this board',
+  'meth.empty': 'The author did not write this section.',
+  'meth.interval': 'How to read intervals',
+  'meth.intervalText':
+    'When the 95% intervals of two items overlap, the data does not show which is better. IndexBoard marks such items as tied and never announces a single winner among them.',
+
+  'pr.title': 'Print view',
+  'pr.print': 'Print or save as PDF',
+  'pr.back': 'Back to board',
+  'pr.hint': 'Light, flat layout for screenshots and printing. Use "Copy PNG" on any chart to paste it into slides or a paper.',
+  'pr.source': 'Source: {url}',
+
+  'imp.empty': 'Paste some data first.',
+  'imp.csvEmpty': 'CSV needs a header row and at least one data row.',
+  'imp.csvNoMetric': 'CSV needs at least one metric column after the item name.',
+  'imp.json': 'This is not valid JSON: {detail}',
+  'imp.jsonShape': 'JSON needs an "items" array (or "models") with scores, and either a "metrics" list or score keys.',
+  'err.title': 'Add a title.',
+  'err.noMetric': 'Add at least one metric.',
+  'err.metricName': 'Metric {n} needs a name.',
+  'err.dupMetric': 'Metric name "{name}" is used twice.',
+  'err.itemName': 'Row {n} has scores but no item name.',
+  'err.number': '{item} / {metric}: "{value}" is not a number.',
+  'err.intervalPair': '{item} / {metric}: give both the low and the high bound, or neither.',
+  'err.intervalOrder': '{item} / {metric}: the interval must contain the score (low ≤ score ≤ high).',
+  'err.runs': '{item} / {metric}: runs must be a whole number of at least 1.',
+  'err.noItem': 'Add at least one item with a name.',
+  'err.saveFailed': 'Saving failed: {detail}',
+  'footer': 'IndexBoard is a free template. Results are the responsibility of each board author.',
+};
+
+export type MsgKey = keyof typeof en;
+
+const zh: Record<MsgKey, string> = {
+  'brand.tag': '把评测结果变成诚实的排行榜',
+  'nav.new': '新建榜单',
+  'nav.home': '首页',
+  'lang.label': '界面语言',
+
+  'home.eyebrow': '免费的评测报告模板',
+  'home.title': '用严谨审稿人的眼光发布评测结果。',
+  'home.lead':
+    '粘贴 JSON 或 CSV，或直接填表。IndexBoard 为每个指标绘制带 95% 置信区间的图表，找出成本前沿，并在榜首顺序没有统计意义时如实说明。',
+  'home.create': '创建榜单',
+  'home.example': '从示例开始',
+  'home.previewCaption': '示例数据。条形为均值，误差线为 95% 区间。',
+  'home.f1.t': '区间，而不只是排名',
+  'home.f1.d': '每个条形都带有 95% 区间。领先者区间重叠时，页面报告为统计并列。',
+  'home.f2.t': '分数与成本对照',
+  'home.f2.d': '分数对成本的散点图，虚线连接在两方面都无人超越的模型。',
+  'home.f3.t': '方法写在页面上',
+  'home.f3.d': '计算公式、完整算例和“保持不变的条件”与结果放在一起。',
+  'home.f4.t': '无需账号即可分享',
+  'home.f4.d': '每个榜单有一个只读公开链接和一个私有编辑密钥，无需登录。',
+  'home.open.t': '已经有榜单了？',
+  'home.open.d': '粘贴分享链接或榜单代码即可打开。',
+  'home.open.placeholder': 'https://…/b/abc123 或 abc123',
+  'home.open.go': '打开',
+
+  'ed.newTitle': '新建榜单',
+  'ed.editTitle': '编辑榜单',
+  'ed.loadExample': '载入示例',
+  'ed.reset': '清空',
+  'ed.preview': '预览',
+  'ed.backToEdit': '返回编辑',
+  'ed.publish': '发布榜单',
+  'ed.saveChanges': '保存修改',
+  'ed.saving': '保存中…',
+  'ed.basics': '基本信息',
+  'ed.title': '标题',
+  'ed.titlePh': '例如：检索问答评测，2026 年 10 月',
+  'ed.description': '简介',
+  'ed.descriptionPh': '评测了什么、使用哪些数据、目的是什么。',
+  'ed.data': '结果数据',
+  'ed.dataHint': '条目是被比较的对象（模型、工具、方法）。区间可选，但强烈建议填写。',
+  'ed.tab.table': '表格',
+  'ed.tab.json': '粘贴 JSON',
+  'ed.tab.csv': '粘贴 CSV',
+  'ed.addMetric': '添加指标',
+  'ed.addItem': '添加条目',
+  'ed.item': '条目',
+  'ed.itemPh': '模型名称',
+  'ed.metricName': '指标名称',
+  'ed.unit': '单位',
+  'ed.removeMetric': '删除指标 {name}',
+  'ed.removeItem': '删除条目 {name}',
+  'ed.value': '分数',
+  'ed.low': '95% 下限',
+  'ed.high': '95% 上限',
+  'ed.runs': '运行次数',
+  'ed.dir.higher': '越高越好',
+  'ed.dir.lower': '越低越好',
+  'ed.import': '导入并替换表格',
+  'ed.imported': '已导入 {items} 个条目和 {metrics} 个指标。',
+  'ed.jsonHelp':
+    '支持 IndexBoard 导出的格式，或 {"metrics": [...], "items": [{"name": "...", "scores": {"Accuracy": {"value": 78.4, "low": 75.9, "high": 80.8, "runs": 5}}}]}。也可以直接写数字。',
+  'ed.csvHelp': '第一列为条目名称。每个指标列后可跟 “<指标> low”、“<指标> high”、“<指标> runs” 列。单位写在括号里，例如 “Cost (CNY)”。',
+  'ed.roles': '图表角色',
+  'ed.primary': '主指标',
+  'ed.primaryHint': '用于顶部提示和散点图纵轴。',
+  'ed.cost': '成本指标',
+  'ed.costHint': '散点图横轴，按越低越好处理。',
+  'ed.costNone': '不设成本指标',
+  'ed.auto': '自动',
+  'ed.method': '方法说明',
+  'ed.formula': '公式与评分方式',
+  'ed.formulaPh': '支持 Markdown。说明每个分数和区间如何计算。',
+  'ed.worked': '完整算例',
+  'ed.workedPh': '以一个条目为例，从原始计数推导到报告数值。',
+  'ed.fixed': '保持不变的条件',
+  'ed.fixedPh': '每行一条，例如：相同的提示词模板',
+  'ed.markdownHint': 'Markdown：**粗体**、`代码`、列表、链接。',
+  'ed.fixIssues': '发布前请修正以下问题',
+  'ed.publishedTitle': '榜单已发布',
+  'ed.publishedDesc': '请妥善保存编辑密钥。持有密钥的人都可以修改此榜单，且密钥无法找回。',
+  'ed.shareLink': '公开分享链接（只读）',
+  'ed.editKey': '编辑密钥',
+  'ed.openBoard': '打开榜单',
+  'ed.keyStored': '当前浏览器也会记住此榜单的密钥。',
+  'ed.unsaved': '未保存修改的预览',
+
+  'key.title': '输入编辑密钥',
+  'key.desc': '只有榜单所有者可以编辑。请粘贴发布时获得的编辑密钥。',
+  'key.ph': '编辑密钥',
+  'key.submit': '解锁编辑',
+  'key.wrong': '编辑密钥与此榜单不匹配。',
+
+  'b.loading': '正在加载榜单…',
+  'b.notFound': '未找到榜单',
+  'b.notFoundDesc': '链接可能有误，或该榜单尚未发布。',
+  'b.loadError': '无法加载此榜单。',
+  'b.retry': '重试',
+  'b.updated': '更新于 {date}',
+  'b.readOnly': '只读',
+  'b.edit': '编辑',
+  'b.copyLink': '复制链接',
+  'b.print': '打印视图',
+  'b.downloadJson': '下载 JSON',
+  'b.linkCopied': '已复制分享链接',
+  'b.copyFailed': '复制失败，请手动选中文本复制。',
+  'b.tab.index': '总览',
+  'b.tab.models': '模型',
+  'b.tab.method': '方法',
+  'b.tile.items': '参与比较的条目',
+  'b.tile.metrics': '指标数',
+  'b.tile.top': '{metric} 第一',
+  'b.tile.tie': '并列：{n} 个条目',
+  'b.tile.runs': '每个条目的运行次数',
+  'b.tile.runsNone': '未报告',
+  'b.tile.frontier': '位于成本前沿',
+
+  'st.tie.t': '榜首统计并列',
+  'st.tie.d': '在 {metric} 上，{names} 的 95% 区间与领先者重叠，它们之间的先后顺序没有统计意义。',
+  'st.lead.t': '{metric} 明确领先',
+  'st.lead.d': '{name} 的 95% 区间与其他条目均不重叠，榜首位置有数据支持。',
+  'st.none.t': '未报告区间',
+  'st.none.d': '没有 95% 区间时，{metric} 上的差异可能只是噪声，请把顺序视为暂定。',
+  'note.tie': '榜首并列：{names}。它们之间的顺序没有意义。',
+  'note.lead': '领先者与其他条目明显拉开。',
+  'note.none': '领先者没有区间，顺序为暂定。',
+  'note.missing': '无分数：{names}。',
+  'chart.higher': '越高越好',
+  'chart.lower': '越低越好',
+  'chart.copyPng': '复制 PNG',
+  'chart.pngCopied': '图表已复制为 PNG',
+  'chart.pngDownloaded': '剪贴板不可用，已改为下载 PNG',
+  'chart.pngFailed': '无法生成 PNG',
+  'chart.scatter': '{score} 与 {cost}',
+  'chart.scatterNote': '虚线连接在 {score} 和 {cost} 两方面都没有被其他条目同时超越的条目。越靠左上越好。',
+  'chart.scatterNoteLower': '虚线连接在 {score} 和 {cost} 两方面都没有被其他条目同时超越的条目。越靠左下越好。',
+  'chart.frontier': '无人超越',
+  'chart.log': '对数刻度',
+  'chart.noCost': '在编辑器中选择成本指标后，即可显示分数与成本散点图。',
+  'chart.scatterEmpty': '同时具备两项分数的条目不足，无法绘图。',
+  'chart.tied': '并列',
+  'chart.legendLead': '领先者及与其并列者',
+  'chart.legendOther': '其他',
+  'chart.legendCi': '95% 区间',
+
+  'm.rank': '排名',
+  'm.item': '条目',
+  'm.sortBy': '按 {name} 排序',
+  'm.note': '按 {metric} 排序。“并列”表示该条目在此指标上的 95% 区间与领先者重叠，并列条目之间的排名没有意义。',
+  'm.runs': '{n} 次',
+
+  'meth.formula': '分数如何计算',
+  'meth.worked': '完整算例',
+  'meth.fixed': '保持不变的条件',
+  'meth.metrics': '本榜单的指标',
+  'meth.empty': '作者未填写此部分。',
+  'meth.interval': '如何解读区间',
+  'meth.intervalText': '当两个条目的 95% 区间重叠时，数据并不能说明哪个更好。IndexBoard 会把它们标记为并列，绝不在其中宣布唯一胜者。',
+
+  'pr.title': '打印视图',
+  'pr.print': '打印或另存为 PDF',
+  'pr.back': '返回榜单',
+  'pr.hint': '浅色、扁平的版式，适合截图和打印。点击任意图表的“复制 PNG”即可粘贴到幻灯片或论文中。',
+  'pr.source': '来源：{url}',
+
+  'imp.empty': '请先粘贴数据。',
+  'imp.csvEmpty': 'CSV 需要一行表头和至少一行数据。',
+  'imp.csvNoMetric': 'CSV 在条目名称之后至少需要一个指标列。',
+  'imp.json': 'JSON 格式无效：{detail}',
+  'imp.jsonShape': 'JSON 需要包含带分数的 "items"（或 "models"）数组，以及 "metrics" 列表或分数键。',
+  'err.title': '请填写标题。',
+  'err.noMetric': '请至少添加一个指标。',
+  'err.metricName': '第 {n} 个指标需要名称。',
+  'err.dupMetric': '指标名称“{name}”重复。',
+  'err.itemName': '第 {n} 行有分数但没有条目名称。',
+  'err.number': '{item} / {metric}：“{value}”不是数字。',
+  'err.intervalPair': '{item} / {metric}：请同时填写下限和上限，或都不填。',
+  'err.intervalOrder': '{item} / {metric}：区间必须包含分数（下限 ≤ 分数 ≤ 上限）。',
+  'err.runs': '{item} / {metric}：运行次数必须是不小于 1 的整数。',
+  'err.noItem': '请至少添加一个有名称的条目。',
+  'err.saveFailed': '保存失败：{detail}',
+  footer: 'IndexBoard 是免费模板，结果内容由各榜单作者负责。',
+};
+
+const DICTS: Record<Lang, Record<MsgKey, string>> = { en, zh };
+const STORE = 'indexboard.lang';
+
+export type TFn = (key: MsgKey | string, params?: Record<string, string | number>) => string;
+
+interface LangCtx {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: TFn;
+}
+
+const Ctx = createContext<LangCtx | null>(null);
+
+function initialLang(): Lang {
+  const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(STORE) : null;
+  if (saved === 'en' || saved === 'zh') return saved;
+  return typeof navigator !== 'undefined' && navigator.language?.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+}
+
+export function LangProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(initialLang);
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    localStorage.setItem(STORE, l);
+  }, []);
+  useEffect(() => {
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  }, [lang]);
+  const t = useCallback<TFn>(
+    (key, params) => {
+      const raw = DICTS[lang][key as MsgKey] ?? en[key as MsgKey] ?? key;
+      if (!params) return raw;
+      return raw.replace(/\{(\w+)\}/g, (m, k) => (params[k] != null ? String(params[k]) : m));
+    },
+    [lang],
+  );
+  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function useI18n(): LangCtx {
+  const v = useContext(Ctx);
+  if (!v) throw new Error('useI18n must be used inside LangProvider');
+  return v;
+}
+
+export function joinNames(names: string[], lang: Lang): string {
+  if (lang === 'zh') return names.join('、');
+  if (names.length <= 2) return names.join(' and ');
+  return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
+}

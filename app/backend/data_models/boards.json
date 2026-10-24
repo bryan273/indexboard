@@ -1,0 +1,36 @@
+{
+    "title": "boards",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "autoincrement id"
+        },
+        "slug": {
+            "type": "string",
+            "description": "public share slug"
+        },
+        "title": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string",
+            "format": "text"
+        },
+        "payload_json": {
+            "type": "string",
+            "format": "text",
+            "description": "JSON with metrics, items, methodology"
+        },
+        "edit_key_hash": {
+            "type": "string",
+            "description": "sha256 of owner edit key"
+        }
+    },
+    "required": [
+        "slug",
+        "title",
+        "payload_json",
+        "edit_key_hash"
+    ]
+}
