@@ -3,6 +3,7 @@ import { ArrowLeft, Download, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import BoardView from '@/components/board/BoardView';
 import { downloadJson, shareUrl } from '@/lib/boardApi';
+import { LiveFooter } from '@/components/board/LiveData';
 import { useI18n } from '@/lib/i18n';
 import { BoardStateNotice, useBoard } from './BoardPage';
 
@@ -44,7 +45,7 @@ export default function PrintPage() {
         <BoardStateNotice state={state} onRetry={reload} />
       ) : (
         <>
-          <BoardView doc={state.board} print />
+          <BoardView doc={state.board} print footer={state.board.payload.live ? <LiveFooter live={state.board.payload.live} /> : undefined} />
           <p className="mx-auto max-w-6xl px-4 py-8 text-[12.5px] text-[#5B6878] sm:px-6">
             {t('pr.source', { url: shareUrl(slug ?? '') })} · IndexBoard
           </p>

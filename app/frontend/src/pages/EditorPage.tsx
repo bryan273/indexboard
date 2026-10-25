@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Copy, Eye, LayoutTemplate, PenLine, Plus, Sparkles, Trash2 } from 'lucide-react';
-import { AI_MAX_CHARS, AiBuildError, buildBoardWithAi } from '@/lib/aiBuild';
+import { AI_MAX_CHARS, AiBuildError, describeToBoard } from '@/lib/aiBuild';
+import { refreshLive } from '@/lib/liveData';
+import { LiveEditorNote } from '@/components/board/LiveData';
 import { TEMPLATE_IDS, templateDoc, templateMeta, type TemplateId } from '@/lib/templates';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -176,7 +178,7 @@ export default function EditorPage() {
     }));
 
   const loadExample = () => {
-    setDraft(docToDraft(exampleDoc(lang)));
+    setDraft({ ...docToDraft(exampleDoc(lang)), live: undefined });
     setIssues([]);
     setAiPlaceholder(false);
     setTopTab('editor');
@@ -216,10 +218,17 @@ export default function EditorPage() {
     setAiBusy(true);
     setAiErr('');
     try {
-      const { result, placeholder } = await buildBoardWithAi(text, lang);
-      applyImported(result);
-      openInEditor(placeholder);
-      toast.success(t('ai.done'));
+      const out = await describeToBoard(text, lang);
+      if (out.kind === 'live') {
+        setDraft(docToDraft(out.doc));
+        openInEditor(false);
+        toast.success(t('live.done', { source: out.doc.payload.live?.source_label ?? '' }));
+      } else {
+        applyImported(out.result);
+        setDraft((d) => ({ ...d, live: undefined }));
+        openInEditor(out.placeholder);
+        toast.success(t('ai.done'));
+      }
     } catch (e) {
       setAiErr(e instanceof AiBuildError ? t(e.key, { detail: e.detail || '—' }) : t('ai.badJson'));
     } finally {
@@ -227,8 +236,23 @@ export default function EditorPage() {
     }
   };
 
+  const [liveBusy, setLiveBusy] = useState(false);
+  const refreshDraftLive = async () => {
+    if (!draft.live) return;
+    setLiveBusy(true);
+    try {
+      const doc = await refreshLive(draft.live, { title: draft.title, description: draft.description });
+      setDraft(docToDraft(doc));
+      toast.success(t('live.refreshed'));
+    } catch (e) {
+      toast.error(t('live.refreshFailed', { detail: errorMessage(e, '') }));
+    } finally {
+      setLiveBusy(false);
+    }
+  };
+
   const applyTemplate = (id: TemplateId) => {
-    setDraft(docToDraft(templateDoc(id, lang)));
+    setDraft({ ...docToDraft(templateDoc(id, lang)), live: undefined });
     openInEditor(true);
     toast.success(t('tpl.loaded', { name: templateMeta(id, lang).title }));
   };
@@ -487,6 +511,7 @@ export default function EditorPage() {
             {templatesPanel}
           </TabsContent>
           <TabsContent value="editor" className="mt-0 flex flex-col gap-6">
+        {draft.live && <LiveEditorNote live={draft.live} onRefresh={refreshDraftLive} busy={liveBusy} />}
         {aiPlaceholder && (
           <div
             role="note"

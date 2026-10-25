@@ -5,6 +5,34 @@ export interface Metric {
   name: string;
   unit: string;
   direction: Direction;
+  source?: string;
+}
+
+export type LiveMetricKey = 'intelligence' | 'coding' | 'math' | 'price' | 'speed' | 'ttft' | 'context';
+export type LiveSource = 'artificial_analysis' | 'openrouter';
+
+export interface LiveModelRef {
+  query: string | null;
+  key: string;
+  name: string;
+  creator: string;
+}
+
+/** Present on boards whose numbers were pulled from a real model-data source. */
+export interface LiveSpec {
+  source: LiveSource;
+  source_label: string;
+  source_url: string;
+  fetched_at: string;
+  stale?: boolean;
+  lang: 'en' | 'zh';
+  requested: LiveMetricKey[];
+  metrics: LiveMetricKey[];
+  unavailable: LiveMetricKey[];
+  models: LiveModelRef[];
+  unmatched: string[];
+  selection: string;
+  top: number | null;
 }
 
 export interface Score {
@@ -32,6 +60,7 @@ export interface BoardPayload {
   methodology: Methodology;
   primary_metric_id: string;
   cost_metric_id: string;
+  live?: LiveSpec;
 }
 
 export interface BoardDoc {
@@ -324,7 +353,9 @@ export function importJson(text: string): Partial<BoardDoc> & { payload: Partial
         : o.direction === 'higher' || o.higher_is_better === true
           ? 'higher'
           : guessDirection(name);
-    return { id: String(o.id ?? name), name, unit: String(o.unit ?? ''), direction: dir };
+    const metric: Metric = { id: String(o.id ?? name), name, unit: String(o.unit ?? ''), direction: dir };
+    if (typeof o.source === 'string' && o.source) metric.source = o.source;
+    return metric;
   });
 
   const items: Item[] = itemsRaw.map((it, idx) => {
@@ -389,6 +420,7 @@ export interface Draft {
   held_fixed: string;
   primary_metric_id: string;
   cost_metric_id: string;
+  live?: LiveSpec;
 }
 
 export interface DraftIssue {
@@ -424,6 +456,7 @@ export function docToDraft(doc: BoardDoc): Draft {
     held_fixed: (p.methodology?.held_fixed ?? []).join('\n'),
     primary_metric_id: p.primary_metric_id ?? '',
     cost_metric_id: p.cost_metric_id ?? '',
+    live: p.live,
   };
 }
 
@@ -506,6 +539,7 @@ export function draftToDoc(d: Draft): { doc: BoardDoc | null; issues: DraftIssue
         },
         primary_metric_id: primary?.id ?? '',
         cost_metric_id: cost?.id ?? 'none',
+        ...(d.live ? { live: d.live } : {}),
       },
     },
     issues,

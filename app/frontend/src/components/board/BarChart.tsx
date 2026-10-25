@@ -67,6 +67,7 @@ export default function BarChart({ analysis, forceLight = false, compact = false
           <h3 className="font-serif-display text-lg font-semibold leading-snug">{metricLabel(metric)}</h3>
           <p className="text-[13px] text-muted-foreground">
             {metric.direction === 'higher' ? t('chart.higher') : t('chart.lower')}
+            {metric.source ? ` · ${t('live.source', { source: metric.source })}` : ''}
           </p>
         </div>
         {showCopy && (

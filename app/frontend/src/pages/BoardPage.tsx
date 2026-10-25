@@ -5,7 +5,10 @@ import { Download, Link2, Pencil, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SiteHeader, { SiteFooter } from '@/components/board/SiteHeader';
 import BoardView from '@/components/board/BoardView';
-import { downloadJson, errorMessage, errorStatus, getBoard, shareUrl, type StoredBoard } from '@/lib/boardApi';
+import { downloadJson, errorMessage, errorStatus, getBoard, getStoredKey, shareUrl, updateBoard, type StoredBoard } from '@/lib/boardApi';
+import type { BoardDoc, LiveSpec } from '@/lib/board';
+import { refreshLive } from '@/lib/liveData';
+import { LiveFooter, RefreshButton } from '@/components/board/LiveData';
 import { useI18n } from '@/lib/i18n';
 
 type LoadState = { kind: 'loading' } | { kind: 'missing' } | { kind: 'error'; message: string } | { kind: 'ready'; board: StoredBoard };
@@ -64,6 +67,35 @@ export default function BoardPage() {
   const { slug } = useParams();
   const { t, lang } = useI18n();
   const { state, reload } = useBoard(slug);
+  const [override, setOverride] = useState<BoardDoc | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    setOverride(null);
+  }, [slug]);
+
+  const refresh = async (board: BoardDoc) => {
+    const live = board.payload.live;
+    if (!live || !slug) return;
+    setRefreshing(true);
+    try {
+      const doc = await refreshLive(live, { title: board.title, description: board.description });
+      const key = getStoredKey(slug);
+      if (key) {
+        try {
+          await updateBoard(slug, doc, key);
+          toast.success(t('live.refreshedSaved'));
+        } catch {
+          toast.success(t('live.refreshedView'));
+        }
+      } else toast.success(t('live.refreshedView'));
+      setOverride(doc);
+    } catch (e) {
+      toast.error(t('live.refreshFailed', { detail: errorMessage(e, '') }));
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   const copyLink = async () => {
     if (!slug) return;
@@ -83,7 +115,15 @@ export default function BoardPage() {
           <BoardStateNotice state={state} onRetry={reload} />
         ) : (
           <BoardView
-            doc={state.board}
+            doc={override ?? state.board}
+            footer={
+              (override ?? state.board).payload.live ? (
+                <LiveFooter
+                  live={(override ?? state.board).payload.live as LiveSpec}
+                  action={<RefreshButton busy={refreshing} onClick={() => refresh(override ?? state.board)} />}
+                />
+              ) : undefined
+            }
             meta={
               <>
                 <span className="rounded-full border px-2.5 py-0.5">{t('b.readOnly')}</span>
@@ -112,7 +152,7 @@ export default function BoardPage() {
                     {t('b.print')}
                   </Link>
                 </Button>
-                <Button variant="outline" className="h-10 !bg-transparent hover:!bg-muted" onClick={() => downloadJson(state.board, slug)}>
+                <Button variant="outline" className="h-10 !bg-transparent hover:!bg-muted" onClick={() => downloadJson(override ?? state.board, slug)}>
                   <Download className="mr-2 h-4 w-4" aria-hidden />
                   {t('b.downloadJson')}
                 </Button>

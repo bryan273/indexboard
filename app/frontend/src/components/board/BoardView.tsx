@@ -54,7 +54,7 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-export default function BoardView({ doc, actions, meta, print = false }: Props) {
+export default function BoardView({ doc, actions, meta, print = false, footer }: Props & { footer?: ReactNode }) {
   const { t, lang } = useI18n();
   const { metrics, items, methodology } = doc.payload;
   const { primary, cost } = resolveRoles(metrics, doc.payload.primary_metric_id, doc.payload.cost_metric_id);
@@ -174,6 +174,7 @@ export default function BoardView({ doc, actions, meta, print = false }: Props) 
           </TabsContent>
         </Tabs>
       )}
+      {footer}
     </article>
   );
 }

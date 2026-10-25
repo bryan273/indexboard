@@ -137,7 +137,9 @@ def _summary(board: Boards) -> Dict[str, Any]:
         rows.sort(key=lambda r: r["value"], reverse=primary.get("direction") != "lower")
         top = rows[:3]
     description = board.description or ""
+    live = payload.get("live") if isinstance(payload.get("live"), dict) else {}
     return {
+        "data_source": live.get("source"),
         "slug": board.slug,
         "title": board.title,
         "description": description[:280],
