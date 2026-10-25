@@ -7,7 +7,7 @@ import secrets
 import string
 from typing import Any, Dict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -104,6 +104,55 @@ async def create_board(data: BoardWrite, db: AsyncSession = Depends(get_db)):
     db.add(board)
     await db.commit()
     return {"slug": slug, "edit_key": edit_key, "board": _serialize(board)}
+
+
+def _num(v: Any):
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    return None
+
+
+def _summary(board: Boards) -> Dict[str, Any]:
+    """Small card summary: counts plus the top 3 items on the headline metric."""
+    try:
+        payload = json.loads(board.payload_json)
+    except (TypeError, ValueError):
+        payload = {}
+    metrics = [m for m in payload.get("metrics") or [] if isinstance(m, dict)]
+    items = [i for i in payload.get("items") or [] if isinstance(i, dict)]
+    pid = payload.get("primary_metric_id")
+    primary = next((m for m in metrics if m.get("id") == pid), None)
+    if primary is None:
+        primary = next((m for m in metrics if m.get("direction") != "lower"), metrics[0] if metrics else None)
+    top = []
+    if primary is not None:
+        rows = []
+        for it in items:
+            score = (it.get("scores") or {}).get(primary.get("id"))
+            value = _num(score.get("value")) if isinstance(score, dict) else None
+            if value is not None:
+                rows.append({"name": str(it.get("name", "")), "value": value})
+        rows.sort(key=lambda r: r["value"], reverse=primary.get("direction") != "lower")
+        top = rows[:3]
+    description = board.description or ""
+    return {
+        "slug": board.slug,
+        "title": board.title,
+        "description": description[:280],
+        "item_count": len(items),
+        "metric_count": len(metrics),
+        "primary_metric": {"name": str(primary.get("name", "")), "unit": str(primary.get("unit", ""))} if primary else None,
+        "top": top,
+        "created_at": board.created_at.isoformat() if board.created_at else None,
+    }
+
+
+@router.get("/boards")
+async def list_recent_boards(limit: int = Query(9, ge=1, le=24), db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(Boards).order_by(Boards.created_at.desc(), Boards.id.desc()).limit(limit))
+    return {"items": [_summary(b) for b in result.scalars().all()]}
 
 
 @router.get("/boards/{slug}")

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Copy, Eye, Plus, Trash2 } from 'lucide-react';
+import { Copy, Eye, LayoutTemplate, PenLine, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { AI_MAX_CHARS, AiBuildError, buildBoardWithAi } from '@/lib/aiBuild';
+import { TEMPLATE_IDS, templateDoc, templateMeta, type TemplateId } from '@/lib/templates';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,6 +27,7 @@ import {
   type Draft,
   type DraftCell,
   type DraftIssue,
+  type ImportedBoard,
   type Metric,
 } from '@/lib/board';
 import {
@@ -44,6 +47,7 @@ import { BoardStateNotice } from './BoardPage';
 const AUTO = '__auto__';
 const NONE = 'none';
 const CELL_FIELDS: (keyof DraftCell)[] = ['value', 'low', 'high', 'runs'];
+type TopTab = 'editor' | 'describe' | 'templates';
 
 function Section({ title, hint, children, aside }: { title: string; hint?: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
@@ -99,6 +103,11 @@ export default function EditorPage() {
   const [importErr, setImportErr] = useState('');
   const [dataTab, setDataTab] = useState('table');
   const [published, setPublished] = useState<{ slug: string; key: string } | null>(null);
+  const [topTab, setTopTab] = useState<TopTab>('editor');
+  const [aiText, setAiText] = useState('');
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiErr, setAiErr] = useState('');
+  const [aiPlaceholder, setAiPlaceholder] = useState(false);
 
   const [editKey, setEditKey] = useState('');
   const [unlock, setUnlock] = useState<'loading' | 'locked' | 'ready' | 'missing' | 'error'>(isEdit ? 'loading' : 'ready');
@@ -169,7 +178,59 @@ export default function EditorPage() {
   const loadExample = () => {
     setDraft(docToDraft(exampleDoc(lang)));
     setIssues([]);
+    setAiPlaceholder(false);
+    setTopTab('editor');
     setDataTab('table');
+  };
+
+  const applyImported = (res: ImportedBoard) => {
+    const p = res.payload;
+    setDraft((d) => ({
+      ...d,
+      title: res.title ?? d.title,
+      description: res.description ?? d.description,
+      metrics: p.metrics,
+      items: itemsToDraft(p.items, p.metrics),
+      primary_metric_id: p.primary_metric_id ?? '',
+      cost_metric_id: p.cost_metric_id ?? '',
+      formula: p.methodology?.formula ?? d.formula,
+      worked_example: p.methodology?.worked_example ?? d.worked_example,
+      held_fixed: p.methodology ? p.methodology.held_fixed.join('\n') : d.held_fixed,
+    }));
+  };
+
+  const openInEditor = (placeholder: boolean) => {
+    setAiPlaceholder(placeholder);
+    setIssues([]);
+    setDataTab('table');
+    setTopTab('editor');
+    window.scrollTo({ top: 0 });
+  };
+
+  const buildAi = async () => {
+    const text = aiText.trim();
+    if (!text) {
+      setAiErr(t('imp.empty'));
+      return;
+    }
+    setAiBusy(true);
+    setAiErr('');
+    try {
+      const { result, placeholder } = await buildBoardWithAi(text, lang);
+      applyImported(result);
+      openInEditor(placeholder);
+      toast.success(t('ai.done'));
+    } catch (e) {
+      setAiErr(e instanceof AiBuildError ? t(e.key, { detail: e.detail || '—' }) : t('ai.badJson'));
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
+  const applyTemplate = (id: TemplateId) => {
+    setDraft(docToDraft(templateDoc(id, lang)));
+    openInEditor(true);
+    toast.success(t('tpl.loaded', { name: templateMeta(id, lang).title }));
   };
 
   const runImport = (kind: 'json' | 'csv') => {
@@ -182,18 +243,7 @@ export default function EditorPage() {
       } else {
         const res = importJson(pasteJson);
         const p = res.payload;
-        setDraft((d) => ({
-          ...d,
-          title: res.title ?? d.title,
-          description: res.description ?? d.description,
-          metrics: p.metrics,
-          items: itemsToDraft(p.items, p.metrics),
-          primary_metric_id: p.primary_metric_id ?? '',
-          cost_metric_id: p.cost_metric_id ?? '',
-          formula: p.methodology?.formula ?? d.formula,
-          worked_example: p.methodology?.worked_example ?? d.worked_example,
-          held_fixed: p.methodology ? p.methodology.held_fixed.join('\n') : d.held_fixed,
-        }));
+        applyImported(res);
         toast.success(t('ed.imported', { items: p.items.length, metrics: p.metrics.length }));
       }
       setDataTab('table');
@@ -253,6 +303,80 @@ export default function EditorPage() {
       setKeyErr(errorMessage(err, t('key.wrong')));
     }
   };
+
+  const describePanel = (
+    <section className="panel p-5 sm:p-6">
+      <h2 className="font-serif-display text-xl font-semibold">{t('ai.title')}</h2>
+      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t('ai.hint')}</p>
+      <Textarea
+        rows={12}
+        className="mt-5 text-[15px]"
+        value={aiText}
+        maxLength={AI_MAX_CHARS}
+        placeholder={t('ai.ph')}
+        aria-label={t('ai.title')}
+        onChange={(e) => setAiText(e.target.value)}
+        disabled={aiBusy}
+      />
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[12.5px] text-muted-foreground">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span>{t('ai.try')}:</span>
+          {(['ai.ex1', 'ai.ex2'] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              disabled={aiBusy}
+              onClick={() => setAiText(t(k))}
+              className="min-h-[36px] max-w-full truncate rounded-full border px-3 text-left text-foreground transition-colors duration-150 hover:bg-muted"
+              title={t(k)}
+            >
+              {t(k).length > 48 ? `${t(k).slice(0, 47)}…` : t(k)}
+            </button>
+          ))}
+        </div>
+        <span className="tabular">{t('ai.chars', { n: aiText.length, max: AI_MAX_CHARS })}</span>
+      </div>
+      {aiErr && (
+        <p role="alert" className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+          {aiErr}
+        </p>
+      )}
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        <Button className="h-11" onClick={buildAi} disabled={aiBusy || !aiText.trim()}>
+          <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+          {aiBusy ? t('ai.building') : t('ai.build')}
+        </Button>
+        <p className="text-[12.5px] text-muted-foreground">{t('ai.privacy')}</p>
+      </div>
+    </section>
+  );
+
+  const templatesPanel = (
+    <section className="flex flex-col gap-4">
+      <p className="text-sm text-muted-foreground">{t('tpl.hint')}</p>
+      <div className="grid gap-5 sm:grid-cols-2">
+        {TEMPLATE_IDS.map((id) => {
+          const meta = templateMeta(id, lang);
+          return (
+            <article key={id} className="panel flex min-w-0 flex-col p-5 sm:p-6">
+              <h3 className="font-serif-display text-xl font-semibold">{meta.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
+              <ul className="mt-4 flex flex-wrap gap-1.5">
+                {meta.metrics.map((m) => (
+                  <li key={m} className="rounded-full border bg-muted/50 px-2.5 py-0.5 text-[12.5px]">
+                    {m}
+                  </li>
+                ))}
+              </ul>
+              <Button className="mt-5 h-10 w-fit" onClick={() => applyTemplate(id)}>
+                {t('tpl.use')}
+              </Button>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
 
   const metricOptions = draft.metrics.filter((m) => m.name.trim());
   const saveLabel = saving ? t('ed.saving') : isEdit ? t('ed.saveChanges') : t('ed.publish');
@@ -329,6 +453,8 @@ export default function EditorPage() {
                 onClick={() => {
                   setDraft(emptyDraft());
                   setIssues([]);
+                  setAiPlaceholder(false);
+                  setTopTab('editor');
                 }}
               >
                 {t('ed.reset')}
@@ -336,6 +462,49 @@ export default function EditorPage() {
             )}
           </div>
         </div>
+
+        <Tabs value={topTab} onValueChange={(v) => setTopTab(v as TopTab)} className="flex flex-col gap-6">
+          {!isEdit && (
+            <TabsList className="h-11 w-full justify-start sm:w-auto sm:self-start">
+              <TabsTrigger value="editor" className="h-9 flex-1 px-3 sm:flex-none sm:px-4">
+                <PenLine className="mr-2 hidden h-4 w-4 sm:inline" aria-hidden />
+                {t('ed.mode.editor')}
+              </TabsTrigger>
+              <TabsTrigger value="describe" className="h-9 flex-1 px-3 sm:flex-none sm:px-4">
+                <Sparkles className="mr-2 hidden h-4 w-4 sm:inline" aria-hidden />
+                {t('ed.mode.describe')}
+              </TabsTrigger>
+              <TabsTrigger value="templates" className="h-9 flex-1 px-3 sm:flex-none sm:px-4">
+                <LayoutTemplate className="mr-2 hidden h-4 w-4 sm:inline" aria-hidden />
+                {t('ed.mode.templates')}
+              </TabsTrigger>
+            </TabsList>
+          )}
+          <TabsContent value="describe" className="mt-0">
+            {describePanel}
+          </TabsContent>
+          <TabsContent value="templates" className="mt-0">
+            {templatesPanel}
+          </TabsContent>
+          <TabsContent value="editor" className="mt-0 flex flex-col gap-6">
+        {aiPlaceholder && (
+          <div
+            role="note"
+            className="flex flex-wrap items-start justify-between gap-3 rounded-[10px] border border-[hsl(var(--warn-border))] bg-[hsl(var(--warn-bg))] px-5 py-4 text-[hsl(var(--warn-fg))]"
+          >
+            <div className="min-w-0">
+              <p className="font-serif-display text-[17px] font-semibold">{t('ai.placeholder')}</p>
+              <p className="mt-1 text-sm opacity-90">{t('ai.placeholderD')}</p>
+            </div>
+            <Button
+              variant="ghost"
+              className="h-10 shrink-0 text-[hsl(var(--warn-fg))] hover:bg-black/5 dark:hover:bg-white/10"
+              onClick={() => setAiPlaceholder(false)}
+            >
+              {t('ai.dismiss')}
+            </Button>
+          </div>
+        )}
 
         {issues.length > 0 && (
           <div role="alert" className="rounded-[10px] border border-destructive/40 bg-destructive/5 px-5 py-4">
@@ -609,6 +778,8 @@ export default function EditorPage() {
             {saveLabel}
           </Button>
         </div>
+          </TabsContent>
+        </Tabs>
       </div>
     );
   };

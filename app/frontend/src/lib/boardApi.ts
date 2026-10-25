@@ -1,5 +1,5 @@
 import { client } from '@/lib/api';
-import type { BoardDoc } from '@/lib/board';
+import { analyzeMetric, resolveRoles, type BoardDoc } from '@/lib/board';
 
 export interface StoredBoard extends BoardDoc {
   slug: string;
@@ -13,6 +13,42 @@ const KEY_STORE = 'indexboard.keys';
 export async function createBoard(doc: BoardDoc): Promise<{ slug: string; edit_key: string; board: StoredBoard }> {
   const res = await client.apiCall.invoke({ url: BASE, method: 'POST', data: doc });
   return res.data;
+}
+
+export interface BoardSummary {
+  slug: string;
+  title: string;
+  description: string;
+  item_count: number;
+  metric_count: number;
+  primary_metric: { name: string; unit: string } | null;
+  top: { name: string; value: number }[];
+  created_at: string | null;
+}
+
+export async function listRecentBoards(limit = 9): Promise<BoardSummary[]> {
+  const res = await client.apiCall.invoke({ url: BASE, method: 'GET', data: { limit } });
+  return Array.isArray(res.data?.items) ? res.data.items : [];
+}
+
+export function summarize(slug: string, doc: BoardDoc): BoardSummary {
+  const { metrics, items } = doc.payload;
+  const { primary } = resolveRoles(metrics, doc.payload.primary_metric_id, doc.payload.cost_metric_id);
+  const top = primary
+    ? analyzeMetric(primary, items)
+        .rows.slice(0, 3)
+        .map((r) => ({ name: r.item.name, value: r.score.value }))
+    : [];
+  return {
+    slug,
+    title: doc.title,
+    description: doc.description.slice(0, 280),
+    item_count: items.length,
+    metric_count: metrics.length,
+    primary_metric: primary ? { name: primary.name, unit: primary.unit } : null,
+    top,
+    created_at: null,
+  };
 }
 
 export async function getBoard(slug: string): Promise<StoredBoard> {

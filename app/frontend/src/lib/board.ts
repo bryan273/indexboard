@@ -362,6 +362,8 @@ export function importJson(text: string): Partial<BoardDoc> & { payload: Partial
   };
 }
 
+export type ImportedBoard = ReturnType<typeof importJson>;
+
 /* ---------- Editor draft ---------- */
 
 export interface DraftCell {
