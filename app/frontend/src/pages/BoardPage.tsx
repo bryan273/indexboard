@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Download, Link2, Pencil, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import SiteHeader, { SiteFooter } from '@/components/board/SiteHeader';
+import AppShell from '@/components/board/AppShell';
 import BoardView from '@/components/board/BoardView';
 import { downloadJson, errorMessage, errorStatus, getBoard, getStoredKey, shareUrl, updateBoard, type StoredBoard } from '@/lib/boardApi';
 import type { BoardDoc, LiveSpec } from '@/lib/board';
@@ -46,7 +46,7 @@ export function BoardStateNotice({ state, onRetry }: { state: LoadState; onRetry
   if (state.kind === 'missing' || state.kind === 'error')
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center sm:px-6">
-        <h1 className="font-serif-display text-3xl font-semibold">{state.kind === 'missing' ? t('b.notFound') : t('b.loadError')}</h1>
+        <h1 className="font-display text-3xl font-semibold">{state.kind === 'missing' ? t('b.notFound') : t('b.loadError')}</h1>
         <p className="mt-3 text-muted-foreground">{state.kind === 'missing' ? t('b.notFoundDesc') : state.message}</p>
         <div className="mt-6 flex justify-center gap-3">
           {state.kind === 'error' && (
@@ -108,9 +108,7 @@ export default function BoardPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main>
+    <AppShell>
         {state.kind !== 'ready' ? (
           <BoardStateNotice state={state} onRetry={reload} />
         ) : (
@@ -166,8 +164,6 @@ export default function BoardPage() {
             }
           />
         )}
-      </main>
-      <SiteFooter />
-    </div>
+      </AppShell>
   );
 }

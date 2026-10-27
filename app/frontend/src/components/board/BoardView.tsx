@@ -31,8 +31,8 @@ export function StatusBanner({ analysis }: { analysis: MetricAnalysis | undefine
         ? t('st.lead.d', { name: analysis.rows[0].item.name })
         : t('st.none.d', { metric: name });
   return (
-    <div role="status" className={`print-avoid rounded-[10px] border px-4 py-3.5 sm:px-5 ${tone}`}>
-      <p className="font-serif-display text-[17px] font-semibold">{title}</p>
+    <div role="status" className={`print-avoid rounded-2xl border px-4 py-3.5 sm:px-5 ${tone}`}>
+      <p className="font-display text-[17px] font-semibold">{title}</p>
       <p className="mt-1 text-[14px] leading-relaxed opacity-90">{body}</p>
     </div>
   );
@@ -42,7 +42,7 @@ function Tile({ label, value, sub }: { label: string; value: string; sub?: strin
   return (
     <div className="panel min-w-0 p-4 sm:p-5">
       <p className="text-[12.5px] leading-snug text-muted-foreground">{label}</p>
-      <p className="font-serif-display tabular mt-2 truncate text-2xl font-semibold leading-tight" title={value}>
+      <p className={`font-display mt-2 truncate text-2xl leading-tight ${/^[\d.,–\s-]+$/.test(value) ? 'tabular' : ''}`} title={value}>
         {value}
       </p>
       {sub && (
@@ -91,7 +91,7 @@ export default function BoardView({ doc, actions, meta, print = false, footer }:
           {t('chart.legendLead')}
         </span>
         <span className="inline-flex items-center gap-2">
-          <span className="h-2.5 w-4 rounded-sm bg-[#9FB3CC] dark:bg-[#50647F]" aria-hidden />
+          <span className="h-2.5 w-4 rounded-sm bg-[#BCC3D9] dark:bg-[#4A4F66]" aria-hidden />
           {t('chart.legendOther')}
         </span>
         <span className="inline-flex items-center gap-2">
@@ -124,7 +124,7 @@ export default function BoardView({ doc, actions, meta, print = false, footer }:
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="min-w-0 max-w-3xl">
             {meta && <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">{meta}</div>}
-            <h1 className="font-serif-display break-words text-[34px] font-semibold leading-[1.1] sm:text-[46px]">{doc.title}</h1>
+            <h1 className="font-display break-words text-[34px] font-semibold leading-[1.1] sm:text-[46px]">{doc.title}</h1>
             {doc.description && <p className="mt-4 whitespace-pre-line text-[16px] leading-relaxed text-muted-foreground">{doc.description}</p>}
           </div>
           {actions && <div className="no-print flex flex-wrap gap-2">{actions}</div>}
@@ -140,15 +140,15 @@ export default function BoardView({ doc, actions, meta, print = false, footer }:
       {print ? (
         <div className="flex flex-col gap-10">
           <section className="flex flex-col gap-4">
-            <h2 className="font-serif-display text-2xl font-semibold">{t('b.tab.index')}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t('b.tab.index')}</h2>
             {indexContent}
           </section>
           <section className="flex flex-col gap-4">
-            <h2 className="font-serif-display text-2xl font-semibold">{t('b.tab.models')}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t('b.tab.models')}</h2>
             <ModelsTable items={items} metrics={metrics} primary={primary} scrollable={false} />
           </section>
           <section className="flex flex-col gap-4">
-            <h2 className="font-serif-display text-2xl font-semibold">{t('b.tab.method')}</h2>
+            <h2 className="font-display text-2xl font-semibold">{t('b.tab.method')}</h2>
             <MethodologyView methodology={methodology} metrics={metrics} />
           </section>
         </div>

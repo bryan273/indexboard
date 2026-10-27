@@ -15,7 +15,7 @@ import {
   type Score,
 } from '@/lib/board';
 import { useI18n } from '@/lib/i18n';
-import { SANS, copySvgAsPng, truncate, useElementWidth, usePalette } from './chartKit';
+import { MONO, SANS, copySvgAsPng, truncate, useElementWidth, usePalette } from './chartKit';
 
 interface Props {
   items: Item[];
@@ -122,7 +122,7 @@ export default function ScatterChart({ items, scoreMetric, costMetric, highlight
     <figure className="panel print-avoid flex min-w-0 flex-col p-4 sm:p-5">
       <figcaption className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-serif-display text-lg font-semibold leading-snug">{title}</h3>
+          <h3 className="font-display text-lg font-semibold leading-snug">{title}</h3>
           <p className="text-[13px] text-muted-foreground">
             {metricLabel(costMetric)}
             {useLog ? ` · ${t('chart.log')}` : ''}
@@ -152,7 +152,7 @@ export default function ScatterChart({ items, scoreMetric, costMetric, highlight
             {yd.ticks.map((tk) => (
               <g key={`y${tk}`}>
                 <line x1={m.l} x2={m.l + pw} y1={yScale(tk)} y2={yScale(tk)} stroke={pal.grid} />
-                <text x={m.l - 8} y={yScale(tk) + 4} textAnchor="end" fontSize={11} fill={pal.muted} fontFamily={SANS}>
+                <text x={m.l - 8} y={yScale(tk) + 4} textAnchor="end" fontSize={11} fill={pal.muted} fontFamily={MONO}>
                   {formatTick(tk)}
                 </text>
               </g>
@@ -160,7 +160,7 @@ export default function ScatterChart({ items, scoreMetric, costMetric, highlight
             {xTicks.map((tk) => (
               <g key={`x${tk}`}>
                 <line x1={xScale(tk)} x2={xScale(tk)} y1={m.t} y2={m.t + ph} stroke={pal.grid} />
-                <text x={xScale(tk)} y={m.t + ph + 16} textAnchor="middle" fontSize={11} fill={pal.muted} fontFamily={SANS}>
+                <text x={xScale(tk)} y={m.t + ph + 16} textAnchor="middle" fontSize={11} fill={pal.muted} fontFamily={MONO}>
                   {formatTick(tk)}
                 </text>
               </g>

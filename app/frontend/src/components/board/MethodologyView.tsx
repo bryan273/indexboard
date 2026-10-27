@@ -10,7 +10,7 @@ interface Props {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="panel print-avoid p-5 sm:p-6">
-      <h3 className="font-serif-display mb-3 text-xl font-semibold">{title}</h3>
+      <h3 className="font-display mb-3 text-xl font-semibold">{title}</h3>
       {children}
     </section>
   );

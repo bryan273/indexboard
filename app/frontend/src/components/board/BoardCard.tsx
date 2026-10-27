@@ -22,7 +22,7 @@ export default function BoardCard({ summary, featured = false }: Props) {
             {t('home.featuredBadge')}
           </span>
         )}
-        <h3 className={`font-serif-display line-clamp-2 break-words font-semibold leading-snug ${featured ? 'text-2xl' : 'text-xl'}`}>
+        <h3 className={`font-display line-clamp-2 break-words font-semibold leading-snug ${featured ? 'text-2xl' : 'text-xl'}`}>
           <Link to={href} className="hover:text-primary">
             {summary.title}
           </Link>

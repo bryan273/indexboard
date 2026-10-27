@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import SiteHeader, { SiteFooter } from '@/components/board/SiteHeader';
+import AppShell from '@/components/board/AppShell';
 import BoardView from '@/components/board/BoardView';
 import {
   docToDraft,
@@ -56,7 +56,7 @@ function Section({ title, hint, children, aside }: { title: string; hint?: strin
     <section className="panel p-5 sm:p-6">
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="font-serif-display text-xl font-semibold">{title}</h2>
+          <h2 className="font-display text-xl font-semibold">{title}</h2>
           {hint && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{hint}</p>}
         </div>
         {aside}
@@ -80,7 +80,7 @@ function CopyField({ label, value, mono = false }: { label: string; value: strin
     <div className="flex flex-col gap-1.5">
       <Label>{label}</Label>
       <div className="flex gap-2">
-        <Input readOnly value={value} className={`h-11 ${mono ? 'font-mono-plex' : ''}`} onFocus={(e) => e.target.select()} />
+        <Input readOnly value={value} className={`h-11 ${mono ? 'font-mono-num' : ''}`} onFocus={(e) => e.target.select()} />
         <Button type="button" variant="outline" className="h-11 w-11 shrink-0 !bg-transparent p-0 hover:!bg-muted" onClick={copy} aria-label={label}>
           <Copy className="h-4 w-4" aria-hidden />
         </Button>
@@ -91,7 +91,7 @@ function CopyField({ label, value, mono = false }: { label: string; value: strin
 
 export default function EditorPage() {
   const { slug } = useParams();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const { t, lang } = useI18n();
   const isEdit = Boolean(slug);
@@ -110,6 +110,15 @@ export default function EditorPage() {
   const [aiBusy, setAiBusy] = useState(false);
   const [aiErr, setAiErr] = useState('');
   const [aiPlaceholder, setAiPlaceholder] = useState(false);
+  const tabParam = params.get('tab');
+  useEffect(() => {
+    if (slug) return;
+    setTopTab(tabParam === 'describe' || tabParam === 'templates' ? tabParam : 'editor');
+  }, [tabParam, slug]);
+  const goTab = (v: TopTab) => {
+    setTopTab(v);
+    if (!slug) setParams(v === 'editor' ? {} : { tab: v }, { replace: true });
+  };
 
   const [editKey, setEditKey] = useState('');
   const [unlock, setUnlock] = useState<'loading' | 'locked' | 'ready' | 'missing' | 'error'>(isEdit ? 'loading' : 'ready');
@@ -181,7 +190,7 @@ export default function EditorPage() {
     setDraft({ ...docToDraft(exampleDoc(lang)), live: undefined });
     setIssues([]);
     setAiPlaceholder(false);
-    setTopTab('editor');
+    goTab('editor');
     setDataTab('table');
   };
 
@@ -205,7 +214,7 @@ export default function EditorPage() {
     setAiPlaceholder(placeholder);
     setIssues([]);
     setDataTab('table');
-    setTopTab('editor');
+    goTab('editor');
     window.scrollTo({ top: 0 });
   };
 
@@ -330,7 +339,7 @@ export default function EditorPage() {
 
   const describePanel = (
     <section className="panel p-5 sm:p-6">
-      <h2 className="font-serif-display text-xl font-semibold">{t('ai.title')}</h2>
+      <h2 className="font-display text-xl font-semibold">{t('ai.title')}</h2>
       <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t('ai.hint')}</p>
       <Textarea
         rows={12}
@@ -383,7 +392,7 @@ export default function EditorPage() {
           const meta = templateMeta(id, lang);
           return (
             <article key={id} className="panel flex min-w-0 flex-col p-5 sm:p-6">
-              <h3 className="font-serif-display text-xl font-semibold">{meta.title}</h3>
+              <h3 className="font-display text-xl font-semibold">{meta.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
               <ul className="mt-4 flex flex-wrap gap-1.5">
                 {meta.metrics.map((m) => (
@@ -413,14 +422,14 @@ export default function EditorPage() {
       return (
         <div className="mx-auto max-w-md px-4 py-20 sm:px-6">
           <form onSubmit={tryUnlock} className="panel flex flex-col gap-4 p-6">
-            <h1 className="font-serif-display text-2xl font-semibold">{t('key.title')}</h1>
+            <h1 className="font-display text-2xl font-semibold">{t('key.title')}</h1>
             <p className="text-sm text-muted-foreground">{t('key.desc')}</p>
             <Input
               value={keyInput}
               onChange={(e) => setKeyInput(e.target.value)}
               placeholder={t('key.ph')}
               aria-label={t('key.ph')}
-              className="font-mono-plex h-11"
+              className="font-mono-num h-11"
               aria-invalid={Boolean(keyErr)}
             />
             {keyErr && (
@@ -463,7 +472,7 @@ export default function EditorPage() {
     return (
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <h1 className="font-serif-display text-[34px] font-semibold leading-tight sm:text-[42px]">
+          <h1 className="font-display text-[34px] font-semibold leading-tight sm:text-[42px]">
             {isEdit ? t('ed.editTitle') : t('ed.newTitle')}
           </h1>
           <div className="flex flex-wrap gap-2">
@@ -478,7 +487,7 @@ export default function EditorPage() {
                   setDraft(emptyDraft());
                   setIssues([]);
                   setAiPlaceholder(false);
-                  setTopTab('editor');
+                  goTab('editor');
                 }}
               >
                 {t('ed.reset')}
@@ -487,7 +496,7 @@ export default function EditorPage() {
           </div>
         </div>
 
-        <Tabs value={topTab} onValueChange={(v) => setTopTab(v as TopTab)} className="flex flex-col gap-6">
+        <Tabs value={topTab} onValueChange={(v) => goTab(v as TopTab)} className="flex flex-col gap-6">
           {!isEdit && (
             <TabsList className="h-11 w-full justify-start sm:w-auto sm:self-start">
               <TabsTrigger value="editor" className="h-9 flex-1 px-3 sm:flex-none sm:px-4">
@@ -515,10 +524,10 @@ export default function EditorPage() {
         {aiPlaceholder && (
           <div
             role="note"
-            className="flex flex-wrap items-start justify-between gap-3 rounded-[10px] border border-[hsl(var(--warn-border))] bg-[hsl(var(--warn-bg))] px-5 py-4 text-[hsl(var(--warn-fg))]"
+            className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[hsl(var(--warn-border))] bg-[hsl(var(--warn-bg))] px-5 py-4 text-[hsl(var(--warn-fg))]"
           >
             <div className="min-w-0">
-              <p className="font-serif-display text-[17px] font-semibold">{t('ai.placeholder')}</p>
+              <p className="font-display text-[17px] font-semibold">{t('ai.placeholder')}</p>
               <p className="mt-1 text-sm opacity-90">{t('ai.placeholderD')}</p>
             </div>
             <Button
@@ -532,7 +541,7 @@ export default function EditorPage() {
         )}
 
         {issues.length > 0 && (
-          <div role="alert" className="rounded-[10px] border border-destructive/40 bg-destructive/5 px-5 py-4">
+          <div role="alert" className="rounded-2xl border border-destructive/40 bg-destructive/5 px-5 py-4">
             <p className="font-medium text-destructive">{t('ed.fixIssues')}</p>
             <ul className="mt-2 list-disc pl-5 text-sm text-foreground">
               {issues.slice(0, 12).map((iss, i) => (
@@ -704,7 +713,7 @@ export default function EditorPage() {
                 <p className="break-words text-sm text-muted-foreground">{kind === 'json' ? t('ed.jsonHelp') : t('ed.csvHelp')}</p>
                 <Textarea
                   rows={12}
-                  className="font-mono-plex text-[13px]"
+                  className="font-mono-num text-[13px]"
                   value={kind === 'json' ? pasteJson : pasteCsv}
                   aria-label={kind === 'json' ? t('ed.tab.json') : t('ed.tab.csv')}
                   placeholder={
@@ -810,14 +819,12 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main>{body()}</main>
-      <SiteFooter />
+    <AppShell>
+      {body()}
       <Dialog open={Boolean(published)} onOpenChange={(o) => !o && published && navigate(`/b/${published.slug}`)}>
         <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="font-serif-display text-2xl">{t('ed.publishedTitle')}</DialogTitle>
+            <DialogTitle className="font-display text-2xl">{t('ed.publishedTitle')}</DialogTitle>
             <DialogDescription>{t('ed.publishedDesc')}</DialogDescription>
           </DialogHeader>
           {published && (
@@ -834,6 +841,6 @@ export default function EditorPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </AppShell>
   );
 }

@@ -4,7 +4,7 @@ import { Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { bounds, formatTick, formatValue, hasInterval, metricLabel, niceDomain, type MetricAnalysis } from '@/lib/board';
 import { joinNames, useI18n } from '@/lib/i18n';
-import { SANS, copySvgAsPng, truncate, useElementWidth, usePalette } from './chartKit';
+import { MONO, SANS, copySvgAsPng, truncate, useElementWidth, usePalette } from './chartKit';
 
 interface Props {
   analysis: MetricAnalysis;
@@ -64,7 +64,7 @@ export default function BarChart({ analysis, forceLight = false, compact = false
     <figure className="panel print-avoid flex min-w-0 flex-col p-4 sm:p-5">
       <figcaption className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-serif-display text-lg font-semibold leading-snug">{metricLabel(metric)}</h3>
+          <h3 className="font-display text-lg font-semibold leading-snug">{metricLabel(metric)}</h3>
           <p className="text-[13px] text-muted-foreground">
             {metric.direction === 'higher' ? t('chart.higher') : t('chart.lower')}
             {metric.source ? ` · ${t('live.source', { source: metric.source })}` : ''}
@@ -91,7 +91,7 @@ export default function BarChart({ analysis, forceLight = false, compact = false
           {dom.ticks.map((tk) => (
             <g key={tk}>
               <line x1={x(tk)} x2={x(tk)} y1={TOP - 4} y2={TOP + rows.length * ROW} stroke={pal.grid} strokeWidth={1} />
-              <text x={x(tk)} y={height - 8} textAnchor="middle" fontSize={11} fill={pal.muted} fontFamily={SANS}>
+              <text x={x(tk)} y={height - 8} textAnchor="middle" fontSize={11} fill={pal.muted} fontFamily={MONO}>
                 {formatTick(tk)}
               </text>
             </g>
@@ -135,7 +135,7 @@ export default function BarChart({ analysis, forceLight = false, compact = false
                   fontSize={12.5}
                   fontWeight={strong ? 600 : 400}
                   fill={pal.text}
-                  fontFamily={SANS}
+                  fontFamily={MONO}
                   style={{ fontVariantNumeric: 'tabular-nums' }}
                 >
                   {formatValue(r.score.value)}

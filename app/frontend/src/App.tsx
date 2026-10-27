@@ -10,19 +10,20 @@ import EditorPage from './pages/EditorPage';
 import BoardPage from './pages/BoardPage';
 import PrintPage from './pages/PrintPage';
 import { LangProvider } from './lib/i18n';
-import { useSystemDark } from './components/board/chartKit';
+import { ThemeProvider, useTheme } from './lib/theme';
 // MODULE_IMPORTS_START
 // MODULE_IMPORTS_END
 
 const queryClient = new QueryClient();
 
 function ThemeSync() {
-  const dark = useSystemDark();
+  const { theme } = useTheme();
   const { pathname } = useLocation();
   const printView = pathname.endsWith('/print');
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark && !printView);
-  }, [dark, printView]);
+    document.documentElement.classList.toggle('dark', theme === 'dark' && !printView);
+    document.documentElement.style.colorScheme = theme === 'dark' && !printView ? 'dark' : 'light';
+  }, [theme, printView]);
   return null;
 }
 
@@ -48,14 +49,16 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     {/* MODULE_PROVIDERS_START */}
     {/* MODULE_PROVIDERS_END */}
-    <LangProvider>
-      <TooltipProvider>
-        <Toaster />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </LangProvider>
+    <ThemeProvider>
+      <LangProvider>
+        <TooltipProvider>
+          <Toaster />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </LangProvider>
+    </ThemeProvider>
     {/* MODULE_PROVIDERS_CLOSE */}
   </QueryClientProvider>
 );

@@ -65,10 +65,10 @@ export function LiveEditorNote({ live, onRefresh, busy }: { live: LiveSpec; onRe
   const fetched = useFetchedLabel(live.fetched_at);
   const missing = live.unavailable.map((k) => liveMetricName(k, live.lang));
   return (
-    <div role="note" className="rounded-[10px] border border-primary/25 bg-accent px-5 py-4 text-accent-foreground">
+    <div role="note" className="rounded-2xl border border-primary/25 bg-accent px-5 py-4 text-accent-foreground">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="font-serif-display text-[17px] font-semibold">{t('live.noteTitle', { source: live.source_label })}</p>
+          <p className="font-display text-[17px] font-semibold">{t('live.noteTitle', { source: live.source_label })}</p>
           <p className="mt-1 text-sm opacity-90">{t('live.noteDesc')}</p>
         </div>
         <RefreshButton onClick={onRefresh} busy={busy} />

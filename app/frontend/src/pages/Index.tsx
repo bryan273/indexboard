@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import SiteHeader, { SiteFooter } from '@/components/board/SiteHeader';
+import AppShell from '@/components/board/AppShell';
 import BarChart from '@/components/board/BarChart';
 import { StatusBanner } from '@/components/board/BoardView';
 import { analyzeMetric, exampleDoc } from '@/lib/board';
@@ -89,13 +89,12 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader />
-      <main className="mx-auto max-w-6xl px-4 sm:px-6">
+    <AppShell>
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <section className="grid gap-10 pb-14 pt-12 sm:pt-16 lg:grid-cols-12 lg:items-center lg:gap-12">
           <div className="min-w-0 lg:col-span-7">
             <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-primary">{t('home.eyebrow')}</p>
-            <h1 className="font-serif-display mt-4 text-[38px] font-semibold leading-[1.08] sm:text-[52px]">{t('home.title')}</h1>
+            <h1 className="font-display mt-4 text-[38px] font-semibold leading-[1.08] sm:text-[52px]">{t('home.title')}</h1>
             <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted-foreground">{t('home.lead')}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="h-11">
@@ -116,8 +115,8 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="border-t py-12" aria-labelledby="featured-title">
-          <h2 id="featured-title" className="font-serif-display text-[28px] font-semibold leading-tight">
+        <section id="featured" className="scroll-mt-20 border-t py-12" aria-labelledby="featured-title">
+          <h2 id="featured-title" className="font-display text-[28px] font-semibold leading-tight">
             {t('home.featured.t')}
           </h2>
           <p className="mt-1 text-[15px] text-muted-foreground">{t('home.featured.d')}</p>
@@ -126,8 +125,8 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="pb-12" aria-labelledby="recent-title">
-          <h2 id="recent-title" className="font-serif-display text-[28px] font-semibold leading-tight">
+        <section id="recent" className="scroll-mt-20 pb-12" aria-labelledby="recent-title">
+          <h2 id="recent-title" className="font-display text-[28px] font-semibold leading-tight">
             {t('home.recent.t')}
           </h2>
           <p className="mt-1 text-[15px] text-muted-foreground">{t('home.recent.d')}</p>
@@ -168,8 +167,8 @@ export default function Index() {
         <section className="grid gap-x-8 gap-y-8 border-t py-12 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f, i) => (
             <div key={f} className="min-w-0">
-              <p className="font-serif-display tabular text-sm text-primary">0{i + 1}</p>
-              <h2 className="font-serif-display mt-2 text-xl font-semibold">{t(`home.${f}.t`)}</h2>
+              <p className="font-display tabular text-sm text-primary">0{i + 1}</p>
+              <h2 className="font-display mt-2 text-xl font-semibold">{t(`home.${f}.t`)}</h2>
               <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{t(`home.${f}.d`)}</p>
             </div>
           ))}
@@ -177,7 +176,7 @@ export default function Index() {
 
         <section className="panel flex flex-col gap-4 p-5 sm:p-6 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="font-serif-display text-xl font-semibold">{t('home.open.t')}</h2>
+            <h2 className="font-display text-xl font-semibold">{t('home.open.t')}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t('home.open.d')}</p>
           </div>
           <form onSubmit={open} className="flex w-full gap-2 md:max-w-md">
@@ -193,8 +192,7 @@ export default function Index() {
             </Button>
           </form>
         </section>
-      </main>
-      <SiteFooter />
-    </div>
+      </div>
+    </AppShell>
   );
 }

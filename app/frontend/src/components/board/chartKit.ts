@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
+import { useTheme } from '@/lib/theme';
 
 export interface ChartPalette {
   text: string;
@@ -10,42 +11,29 @@ export interface ChartPalette {
 }
 
 const LIGHT: ChartPalette = {
-  text: '#14202E',
-  muted: '#5B6878',
-  grid: '#E3E8EF',
-  accent: '#1F4E8C',
-  barMuted: '#9FB3CC',
+  text: '#1D1D1F',
+  muted: '#5C5C66',
+  grid: '#ECECF1',
+  accent: '#2B59FF',
+  barMuted: '#BCC3D9',
   surface: '#FFFFFF',
 };
 
 const DARK: ChartPalette = {
-  text: '#E5EBF2',
-  muted: '#9DA9B7',
-  grid: '#26313D',
-  accent: '#6FA3E6',
-  barMuted: '#50647F',
-  surface: '#141C25',
+  text: '#F4F4F6',
+  muted: '#ADADB8',
+  grid: '#24242B',
+  accent: '#7B96FF',
+  barMuted: '#4A4F66',
+  surface: '#151519',
 };
 
-export const SANS = "'IBM Plex Sans', system-ui, -apple-system, 'PingFang SC', sans-serif";
-export const SERIF = "'Fraunces', Georgia, 'Songti SC', serif";
-
-const QUERY = '(prefers-color-scheme: dark)';
-
-export function useSystemDark(): boolean {
-  const [dark, setDark] = useState(() => typeof window !== 'undefined' && window.matchMedia(QUERY).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(QUERY);
-    const onChange = () => setDark(mq.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-  return dark;
-}
+export const SANS = "Inter, 'Noto Sans SC', system-ui, -apple-system, sans-serif";
+export const MONO = "'JetBrains Mono', ui-monospace, SFMono-Regular, monospace";
 
 export function usePalette(forceLight = false): ChartPalette {
-  const dark = useSystemDark();
-  return dark && !forceLight ? DARK : LIGHT;
+  const { theme } = useTheme();
+  return theme === 'dark' && !forceLight ? DARK : LIGHT;
 }
 
 export function useElementWidth<T extends HTMLElement>(fallback = 640): [RefObject<T>, number] {
