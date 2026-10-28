@@ -28,10 +28,11 @@ const SUITE: { id: string; label: string; href: string; en: string; zh: string }
   { id: 'hub', label: 'All apps', href: 'https://reprosuite-aiid.atoms.world', en: 'The Repro Suite home', zh: 'Repro Suite 首页' },
 ];
 const EXPLAINER = 'https://paperexplainer-aiid.pub.atoms.world';
+const AGENT = 'https://paperrepro-aiid.atoms.world/repro/index.html';
 
 const T = {
-  en: { menu: 'Menu', suite: 'Repro Suite', newTab: 'opens in a new tab', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', nw: 'New', here: 'you are here' },
-  zh: { menu: '菜单', suite: 'Repro Suite', newTab: '在新标签页打开', toLight: '切换到浅色模式', toDark: '切换到深色模式', nw: '新', here: '当前应用' },
+  en: { menu: 'Menu', suite: 'Paper Repro Suite', newTab: 'opens in a new tab', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', nw: 'New', here: 'you are here' },
+  zh: { menu: '菜单', suite: 'Paper Repro Suite', newTab: '在新标签页打开', toLight: '切换到浅色模式', toDark: '切换到深色模式', nw: '新', here: '当前应用' },
 } as const;
 
 function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
@@ -88,7 +89,7 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
     return () => document.body.classList.remove('stb-lock');
   }, [open]);
 
-  const suiteLinks = SUITE.filter((s) => s.id !== appId);
+  const suiteLinks = SUITE.filter((s) => s.id !== appId && s.id !== 'agent');
 
   return (
     <>
@@ -107,7 +108,12 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           <span className="stb-sep" aria-hidden />
           {appId !== 'explainer' && (
             <a href={EXPLAINER} target="_blank" rel="noopener noreferrer">
-              Paper Explainer <span className="stb-new">{t.nw}</span>
+              Paper Explainer
+            </a>
+          )}
+          {appId !== 'agent' && (
+            <a href={AGENT} target="_blank" rel="noopener noreferrer">
+              Paper Repro Agent
             </a>
           )}
           <div className="stb-suite" ref={ref}>
@@ -152,7 +158,16 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
             <>
               <div className="stb-h">Learn</div>
               <a href={EXPLAINER} target="_blank" rel="noopener noreferrer">
-                Paper Explainer <span className="stb-new">{t.nw}</span>
+                Paper Explainer
+                <em>↗</em>
+              </a>
+            </>
+          )}
+          {appId !== 'agent' && (
+            <>
+              <div className="stb-h">Check</div>
+              <a href={AGENT} target="_blank" rel="noopener noreferrer">
+                Paper Repro Agent
                 <em>↗</em>
               </a>
             </>

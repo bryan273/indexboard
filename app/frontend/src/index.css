@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700;800&display=swap');
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/Inter-400.woff2) format('woff2')}
+@font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;font-display:swap;src:url(/fonts/SpaceGrotesk-500.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url(/fonts/JetBrainsMono-400.woff2) format('woff2')}
 
 @tailwind base;
 @tailwind components;
@@ -89,7 +91,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', 'Noto Sans SC', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     font-feature-settings: 'cv11', 'ss01';
   }
 
@@ -157,7 +159,7 @@
 }
 
 .font-display {
-  font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif;
+  font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
   font-weight: 800 !important;
   letter-spacing: -0.035em;
 }
@@ -188,4 +190,4 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-even
   background: radial-gradient(55% 45% at 86% -8%, hsl(var(--primary) / 0.15), transparent 70%),
               radial-gradient(40% 35% at 4% 6%, rgba(34, 195, 238, 0.11), transparent 70%),
               radial-gradient(35% 30% at 60% 100%, rgba(255, 180, 138, 0.10), transparent 70%); }
-h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Inter', 'Noto Sans SC', system-ui, sans-serif; letter-spacing: -0.03em; }
+h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; letter-spacing: -0.03em; }
