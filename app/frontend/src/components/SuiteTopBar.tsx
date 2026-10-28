@@ -101,18 +101,18 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           <b>{brand}</b>
         </Link>
 
-        <nav className="stb-nav" aria-label={brand}>
+        <nav className={`stb-nav${nav.length >= 5 ? ' stb-dense' : ''}`} aria-label={brand}>
           {nav.map((l) => (
             <NavItem key={l.label} l={l} onDone={() => undefined} />
           ))}
           <span className="stb-sep" aria-hidden />
           {appId !== 'explainer' && (
-            <a href={EXPLAINER} target="_blank" rel="noopener noreferrer">
+            <a className="stb-x" href={EXPLAINER} target="_blank" rel="noopener noreferrer">
               Paper Explainer
             </a>
           )}
           {appId !== 'agent' && (
-            <a href={AGENT} target="_blank" rel="noopener noreferrer">
+            <a className="stb-x" href={AGENT} target="_blank" rel="noopener noreferrer">
               Paper Repro Agent
             </a>
           )}
@@ -157,7 +157,7 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           {appId !== 'explainer' && (
             <>
               <div className="stb-h">Learn</div>
-              <a href={EXPLAINER} target="_blank" rel="noopener noreferrer">
+              <a className="stb-x" href={EXPLAINER} target="_blank" rel="noopener noreferrer">
                 Paper Explainer
                 <em>↗</em>
               </a>
@@ -166,7 +166,7 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           {appId !== 'agent' && (
             <>
               <div className="stb-h">Check</div>
-              <a href={AGENT} target="_blank" rel="noopener noreferrer">
+              <a className="stb-x" href={AGENT} target="_blank" rel="noopener noreferrer">
                 Paper Repro Agent
                 <em>↗</em>
               </a>

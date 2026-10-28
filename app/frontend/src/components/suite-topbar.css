@@ -11,6 +11,8 @@
   color: var(--stb-mutedfg, hsl(var(--muted-foreground))); font: 500 14px 'Inter', 'Noto Sans SC', sans-serif; white-space: nowrap; text-decoration: none; }
 .stb-nav > a:hover, .stb-suite > button:hover, .stb-suite > button[aria-expanded='true'] { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); }
 .stb-nav > a.on { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); font-weight: 600; }
+/* an app with many own links keeps the two quick links inside the Suite menu until the bar is wide enough */
+@media (max-width: 1560px) { .stb-dense > a.stb-x { display: none; } }
 .stb-sep { width: 1px; height: 18px; background: var(--stb-border, hsl(var(--border))); margin: 0 8px; }
 .stb-new { font: 700 10px 'Inter', sans-serif; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; background: linear-gradient(135deg, #5b4bff, #ff7a59); color: #fff; }
 .stb-suite { position: relative; }
@@ -33,7 +35,7 @@
 .stb-sheet a:hover, .stb-sheet a.on { background: var(--stb-soft, hsl(var(--muted))); }
 .stb-sheet em { margin-left: auto; font-style: normal; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); }
 body.stb-lock { overflow: hidden; }
-@media (max-width: 980px) {
+@media (max-width: 1240px) {
   .stb-nav { display: none; }
   .stb-burger { display: grid; }
 }
