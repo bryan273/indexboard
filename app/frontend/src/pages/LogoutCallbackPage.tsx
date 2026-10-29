@@ -6,7 +6,7 @@ const LogoutCallbackPage: React.FC = () => {
     // The OIDC provider has logged out the user and redirected here
     // We can redirect to the home page or show a logout success message
     setTimeout(() => {
-      window.location.href = '/';
+      window.location.href = import.meta.env.BASE_URL;
     }, 2000);
   }, []);
 

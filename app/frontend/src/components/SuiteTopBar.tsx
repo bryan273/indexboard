@@ -19,16 +19,16 @@ type Props = {
 };
 
 const SUITE: { id: string; label: string; href: string; en: string; zh: string }[] = [
-  { id: 'agent', label: 'Paper Repro Agent', href: 'https://paper-repro-aiid.vercel.app/repro/index.html', en: 'Check whether a paper reproduces', zh: '核验论文能否复现' },
-  { id: 'bench', label: 'Benchmark', href: 'https://paper-repro-aiid.vercel.app/repro/bench.html', en: 'Six models, 32 papers', zh: '6 个模型，32 篇论文' },
-  { id: 'lite', label: 'Repro Lite', href: 'https://repro-lite-aiid.vercel.app', en: 'Check one claim in your browser', zh: '在浏览器里核验一个结论' },
-  { id: 'companion', label: 'Reading Companion', href: 'https://reading-companion-aiid.vercel.app', en: 'Read arXiv papers with cited answers', zh: '阅读 arXiv 论文，答案带引用' },
-  { id: 'indexboard', label: 'IndexBoard', href: 'https://indexboard-aiid.vercel.app/b/5dhum9j5h0', en: 'Honest leaderboards with ties', zh: '如实呈现并列的排行榜' },
-  { id: 'desk', label: 'Repro Desk', href: 'https://repro-desk-aiid.vercel.app', en: 'Ask for a human-checked reproduction', zh: '申请人工核对的复现' },
-  { id: 'hub', label: 'All apps', href: 'https://repro-suite-hub-aiid.vercel.app', en: 'The Repro Suite home', zh: 'Repro Suite 首页' },
+  { id: 'agent', label: 'Paper Repro Agent', href: 'https://bryan273.github.io/repro-suite/repro/index.html', en: 'Check whether a paper reproduces', zh: '核验论文能否复现' },
+  { id: 'bench', label: 'Benchmark', href: 'https://bryan273.github.io/repro-suite/repro/bench.html', en: 'Six models, 32 papers', zh: '6 个模型，32 篇论文' },
+  { id: 'lite', label: 'Repro Lite', href: 'https://bryan273.github.io/repro-suite/lite', en: 'Check one claim in your browser', zh: '在浏览器里核验一个结论' },
+  { id: 'companion', label: 'Reading Companion', href: 'https://bryan273.github.io/repro-suite/reading', en: 'Read arXiv papers with cited answers', zh: '阅读 arXiv 论文，答案带引用' },
+  { id: 'indexboard', label: 'IndexBoard', href: 'https://bryan273.github.io/repro-suite/indexboard/b/5dhum9j5h0', en: 'Honest leaderboards with ties', zh: '如实呈现并列的排行榜' },
+  { id: 'desk', label: 'Repro Desk', href: 'https://bryan273.github.io/repro-suite/desk', en: 'Ask for a human-checked reproduction', zh: '申请人工核对的复现' },
+  { id: 'hub', label: 'All apps', href: 'https://bryan273.github.io/repro-suite/hub', en: 'The Repro Suite home', zh: 'Repro Suite 首页' },
 ];
-const EXPLAINER = 'https://paper-explainer-aiid.vercel.app';
-const AGENT = 'https://paper-repro-aiid.vercel.app/repro/index.html';
+const EXPLAINER = 'https://bryan273.github.io/repro-suite/explainer';
+const AGENT = 'https://bryan273.github.io/repro-suite/repro/index.html';
 
 const T = {
   en: { menu: 'Menu', suite: 'Paper Repro Suite', newTab: 'opens in a new tab', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', nw: 'New', here: 'you are here' },

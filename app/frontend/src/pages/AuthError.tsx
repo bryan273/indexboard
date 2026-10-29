@@ -17,7 +17,7 @@ export default function AuthErrorPage() {
         if (prev <= 1) {
           clearInterval(timer);
           // Redirect to home page
-          window.location.href = '/';
+          window.location.href = import.meta.env.BASE_URL;
           return 0;
         }
         return prev - 1;
@@ -29,7 +29,7 @@ export default function AuthErrorPage() {
   }, []);
 
   const handleReturnHome = () => {
-    window.location.href = '/';
+    window.location.href = import.meta.env.BASE_URL;
   };
 
   return (

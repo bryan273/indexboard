@@ -100,7 +100,7 @@ export function storeKey(slug: string, key: string): void {
 }
 
 export function shareUrl(slug: string): string {
-  return `${window.location.origin}/b/${slug}`;
+  return `${window.location.origin}${import.meta.env.BASE_URL.replace(/\/$/, '')}/b/${slug}`;
 }
 
 export function downloadJson(doc: BoardDoc, slug?: string): void {
