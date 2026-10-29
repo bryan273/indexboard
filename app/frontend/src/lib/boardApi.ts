@@ -1,4 +1,4 @@
-import { client } from '@/lib/api';
+import { suiteCall } from '@/lib/suiteData';
 import { analyzeMetric, resolveRoles, type BoardDoc } from '@/lib/board';
 
 export interface StoredBoard extends BoardDoc {
@@ -7,12 +7,10 @@ export interface StoredBoard extends BoardDoc {
   updated_at: string | null;
 }
 
-const BASE = '/api/v1/indexboard/boards';
 const KEY_STORE = 'indexboard.keys';
 
 export async function createBoard(doc: BoardDoc): Promise<{ slug: string; edit_key: string; board: StoredBoard }> {
-  const res = await client.apiCall.invoke({ url: BASE, method: 'POST', data: doc });
-  return res.data;
+  return suiteCall<{ slug: string; edit_key: string; board: StoredBoard }>({ op: 'board_create', title: doc.title, description: doc.description, payload: doc.payload });
 }
 
 export interface BoardSummary {
@@ -27,8 +25,8 @@ export interface BoardSummary {
 }
 
 export async function listRecentBoards(limit = 9): Promise<BoardSummary[]> {
-  const res = await client.apiCall.invoke({ url: BASE, method: 'GET', data: { limit } });
-  return Array.isArray(res.data?.items) ? res.data.items : [];
+  const res = await suiteCall<{ items: BoardSummary[] }>({ op: 'board_list', limit });
+  return Array.isArray(res.items) ? res.items : [];
 }
 
 export function summarize(slug: string, doc: BoardDoc): BoardSummary {
@@ -52,26 +50,16 @@ export function summarize(slug: string, doc: BoardDoc): BoardSummary {
 }
 
 export async function getBoard(slug: string): Promise<StoredBoard> {
-  const res = await client.apiCall.invoke({ url: `${BASE}/${encodeURIComponent(slug)}`, method: 'GET', data: {} });
-  return res.data;
+  return suiteCall<StoredBoard>({ op: 'board_get', slug });
 }
 
 export async function updateBoard(slug: string, doc: BoardDoc, editKey: string): Promise<StoredBoard> {
-  const res = await client.apiCall.invoke({
-    url: `${BASE}/${encodeURIComponent(slug)}`,
-    method: 'PUT',
-    data: { ...doc, edit_key: editKey },
-  });
-  return res.data;
+  return suiteCall<StoredBoard>({ op: 'board_update', slug, title: doc.title, description: doc.description, payload: doc.payload, edit_key: editKey });
 }
 
 export async function verifyKey(slug: string, editKey: string): Promise<boolean> {
-  const res = await client.apiCall.invoke({
-    url: `${BASE}/${encodeURIComponent(slug)}/verify`,
-    method: 'POST',
-    data: { edit_key: editKey },
-  });
-  return Boolean(res.data?.valid);
+  const res = await suiteCall<{ valid: boolean }>({ op: 'board_verify', slug, edit_key: editKey });
+  return Boolean(res.valid);
 }
 
 interface ApiErrorShape {

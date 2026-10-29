@@ -1,4 +1,4 @@
-import { client } from '@/lib/api';
+import { suiteCall } from '@/lib/suiteData';
 import type { BoardDoc, Item, LiveMetricKey, LiveModelRef, LiveSource, LiveSpec, Metric, Score } from '@/lib/board';
 
 type L = 'en' | 'zh';
@@ -112,12 +112,7 @@ export function attributionLine(source: LiveSource): string {
 }
 
 export async function fetchModelData(models: string[], top: number | null): Promise<ModelDataResponse> {
-  const res = await client.apiCall.invoke({
-    url: '/api/v1/model-data',
-    method: 'POST',
-    data: { models, top: models.length ? null : top },
-  });
-  return res.data as ModelDataResponse;
+  return suiteCall<ModelDataResponse>({ op: 'model_data', models, top: models.length ? null : top });
 }
 
 function joinList(names: string[], lang: L): string {
