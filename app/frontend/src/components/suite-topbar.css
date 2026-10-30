@@ -136,3 +136,9 @@ button.bg-primary:hover:not(:disabled), a.bg-primary:hover { transform: translat
 button.bg-primary:active:not(:disabled) { transform: none; }
 a.card, .card { transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
 a.card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px rgba(60,40,160,.35); }
+
+/* a11y fixes from the axe pass: chip contrast and 32px minimum targets */
+.sfm-chip, .sfm-cite { color: color-mix(in srgb, hsl(var(--primary)) 55%, #000); }
+.dark .sfm-chip, .dark .sfm-cite { color: hsl(var(--primary)); }
+.sft-bar a { display: inline-flex; align-items: center; min-height: 32px; }
+.stb-brand { min-height: 40px; }

@@ -64,7 +64,7 @@ export default function BarChart({ analysis, forceLight = false, compact = false
     <figure className="panel print-avoid flex min-w-0 flex-col p-4 sm:p-5">
       <figcaption className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-semibold leading-snug">{metricLabel(metric)}</h3>
+          <h2 className="font-display text-lg font-semibold leading-snug">{metricLabel(metric)}</h2>
           <p className="text-[13px] text-muted-foreground">
             {metric.direction === 'higher' ? t('chart.higher') : t('chart.lower')}
             {metric.source ? ` · ${t('live.source', { source: metric.source })}` : ''}

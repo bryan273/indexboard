@@ -69,7 +69,7 @@ export function LiveEditorNote({ live, onRefresh, busy }: { live: LiveSpec; onRe
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-display text-[17px] font-semibold">{t('live.noteTitle', { source: live.source_label })}</p>
-          <p className="mt-1 text-sm opacity-90">{t('live.noteDesc')}</p>
+          <p className="mt-1 text-sm">{t('live.noteDesc')}</p>
         </div>
         <RefreshButton onClick={onRefresh} busy={busy} />
       </div>

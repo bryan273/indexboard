@@ -122,7 +122,7 @@ export default function ScatterChart({ items, scoreMetric, costMetric, highlight
     <figure className="panel print-avoid flex min-w-0 flex-col p-4 sm:p-5">
       <figcaption className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-semibold leading-snug">{title}</h3>
+          <h2 className="font-display text-lg font-semibold leading-snug">{title}</h2>
           <p className="text-[13px] text-muted-foreground">
             {metricLabel(costMetric)}
             {useLog ? ` · ${t('chart.log')}` : ''}
