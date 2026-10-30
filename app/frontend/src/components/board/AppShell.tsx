@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuiteTopBar from '@/components/SuiteTopBar';
+import { SuiteFooter } from '@/components/SuiteFooter';
 import { useI18n, type MsgKey } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 
@@ -55,9 +56,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </div>
       <div className="flex min-w-0 flex-1 flex-col">
         <main className="flex-1">{children}</main>
-        <footer className="no-print mt-16 border-t">
-          <div className="mx-auto max-w-6xl px-4 py-8 text-[13px] text-muted-foreground sm:px-6">{t('footer')}</div>
-        </footer>
+        <div className="no-print">
+          <SuiteFooter lang={lang} appId="indexboard" note={t('footer')} />
+        </div>
       </div>
     </div>
   );

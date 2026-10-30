@@ -10,6 +10,7 @@ import BarChart from '@/components/board/BarChart';
 import { StatusBanner } from '@/components/board/BoardView';
 import { analyzeMetric, exampleDoc } from '@/lib/board';
 import { useI18n } from '@/lib/i18n';
+import { SuiteFaq, SuiteCta } from '@/components/SuiteFooter';
 
 const FEATURES = ['f1', 'f2', 'f3', 'f4'] as const;
 
@@ -38,6 +39,24 @@ function CardSkeleton() {
     </div>
   );
 }
+
+
+const FAQ = {
+  en: [
+    { q: 'What is a statistical tie?', a: 'When the 95% intervals of two models overlap, the data cannot say which one is better. IndexBoard says so at the top of the board instead of printing a fake first place.' },
+    { q: 'What data can I paste?', a: 'JSON or CSV, or fill a table by hand. Each row is a model and each column is a metric, with an interval or enough runs to compute one.' },
+    { q: 'Do I need an account?', a: 'No. Each board gets a read-only public link and a private edit key. Keep the key to change the board later.' },
+    { q: 'What is the score against cost chart?', a: 'A scatter plot with a dashed frontier through the models that nobody beats on both score and cost.' },
+    { q: 'Who is responsible for the numbers?', a: 'The author of each board. IndexBoard is a free template: it draws and explains the results, it does not verify them.' },
+  ],
+  zh: [
+    { q: '什么是统计意义上的并列？', a: '当两个模型的 95% 区间重叠时，数据无法说明谁更好。IndexBoard 会在榜单顶部直接说明，而不是给出虚假的第一名。' },
+    { q: '可以粘贴什么数据？', a: 'JSON 或 CSV，也可以手动填表。每行是一个模型，每列是一个指标，需带区间或足够的多次运行结果以便计算区间。' },
+    { q: '需要账号吗？', a: '不需要。每个榜单有只读公开链接和私有编辑密钥，保留密钥即可日后修改。' },
+    { q: '“得分对成本”图是什么？', a: '一张散点图，虚线前沿穿过在得分和成本上都无人能超越的模型。' },
+    { q: '数字由谁负责？', a: '由每个榜单的作者负责。IndexBoard 是免费模板：它负责绘制和解释结果，不负责核实结果。' },
+  ],
+};
 
 export default function Index() {
   const { t, lang } = useI18n();
@@ -192,6 +211,14 @@ export default function Index() {
             </Button>
           </form>
         </section>
+
+        <SuiteFaq lang={lang} id="faq" items={FAQ[lang]} />
+        <SuiteCta
+          title={lang === 'zh' ? '准备好发布你的评测结果了吗？' : 'Ready to publish your results?'}
+          body={lang === 'zh' ? '粘贴数据，几秒钟内得到一个诚实的榜单。' : 'Paste your data and get an honest board in seconds.'}
+          label={lang === 'zh' ? '创建榜单' : 'Create a board'}
+          to="/new"
+        />
       </div>
     </AppShell>
   );
