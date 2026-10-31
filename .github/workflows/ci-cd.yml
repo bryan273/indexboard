@@ -45,7 +45,7 @@ jobs:
         run: npx vite build
       - name: Smoke check of the build
         run: test -s dist/index.html && grep -q "/repro-suite/$APP/" dist/index.html
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: site
           path: app/frontend/dist
