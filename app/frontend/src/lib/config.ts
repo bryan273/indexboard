@@ -13,6 +13,12 @@ const defaultConfig = {
 
 // Function to load runtime configuration
 export async function loadRuntimeConfig(): Promise<void> {
+  // The Atoms template asked its host for /api/config; these apps run on static hosting with Supabase functions, so the request is skipped
+  // (it only produced a 404 on every page load). Set VITE_RUNTIME_CONFIG=1 to bring it back.
+  if (import.meta.env.VITE_RUNTIME_CONFIG !== '1') {
+    configLoading = false;
+    return;
+  }
   try {
     console.log('🔧 DEBUG: Starting to load runtime config...');
     // Try to load configuration from a config endpoint
