@@ -33,7 +33,7 @@ export function StatusBanner({ analysis }: { analysis: MetricAnalysis | undefine
   return (
     <div role="status" className={`print-avoid rounded-2xl border px-4 py-3.5 sm:px-5 ${tone}`}>
       <p className="font-display text-[17px] font-semibold">{title}</p>
-      <p className="mt-1 text-[14px] leading-relaxed opacity-90">{body}</p>
+      <p className="mt-1 text-[14px] leading-relaxed">{body}</p>
     </div>
   );
 }

@@ -1,0 +1,82 @@
+# CI and site publishing for this app.
+# Every push and pull request: install, type-check, lint and build exactly as the live site is built.
+# A push to main that passes also publishes the build to the Pages site (repro-suite repo, folder indexboard/).
+# Nothing here needs an .env file: the app talks to the hosted Supabase functions whose URL is in the code.
+name: ci-cd
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP: indexboard
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: app/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/frontend/package-lock.json
+      - run: npm ci
+      - name: Type check
+        run: npx tsc --noEmit -p tsconfig.app.json
+      - name: Lint
+        run: npx eslint --quiet ./src
+      - name: Build (the same base path as the live site)
+        env:
+          VITE_BASE: /repro-suite/${{ env.APP }}/
+        run: npx vite build
+      - name: Smoke check of the build
+        run: test -s dist/index.html && grep -q "/repro-suite/$APP/" dist/index.html
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: app/frontend/dist
+          retention-days: 3
+
+  publish:
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: dist
+      - name: Publish to the Pages site
+        env:
+          DEPLOY_KEY: ${{ secrets.SITE_DEPLOY_KEY }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          if [ -z "$DEPLOY_KEY" ]; then echo "::notice::SITE_DEPLOY_KEY is not set in this repo, so the build was checked but not published."; exit 0; fi
+          mkdir -p ~/.ssh && printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/site_key && chmod 600 ~/.ssh/site_key
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i $HOME/.ssh/site_key -o IdentitiesOnly=yes"
+          git clone --depth 1 git@github.com:bryan273/repro-suite.git site
+          rm -rf "site/$APP" && mkdir -p "site/$APP" && cp -r dist/. "site/$APP/"
+          cd site
+          git config user.name "repro-suite bot" && git config user.email "bot@users.noreply.github.com"
+          git add -A "$APP"
+          if git diff --cached --quiet; then echo "nothing changed"; exit 0; fi
+          git commit -q -m "$APP: ${GITHUB_SHA::7} $(printf '%s' "$COMMIT_MSG" | head -n1 | cut -c1-100)"
+          # the apps publish into the same repo, so a push can race: rebase and retry
+          for i in 1 2 3 4 5 6; do git push && exit 0; git pull --rebase -q; done
+          exit 1
