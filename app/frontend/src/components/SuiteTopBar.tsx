@@ -105,17 +105,6 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           {nav.map((l) => (
             <NavItem key={l.label} l={l} onDone={() => undefined} />
           ))}
-          <span className="stb-sep" aria-hidden />
-          {appId !== 'explainer' && (
-            <a className="stb-x" href={EXPLAINER} target="_blank" rel="noopener noreferrer">
-              Paper Explainer
-            </a>
-          )}
-          {appId !== 'agent' && (
-            <a className="stb-x" href={AGENT} target="_blank" rel="noopener noreferrer">
-              Paper Repro Agent
-            </a>
-          )}
           <div className="stb-suite" ref={ref}>
             <button type="button" aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
               {t.suite} <span aria-hidden>▾</span>
