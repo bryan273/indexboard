@@ -256,6 +256,8 @@ const en = {
   'err.intervalOrder': '{item} / {metric}: the interval must contain the score (low ≤ score ≤ high).',
   'err.runs': '{item} / {metric}: runs must be a whole number of at least 1.',
   'err.noItem': 'Add at least one item with a name.',
+  'err.noScore': 'Enter at least one score before publishing.',
+  'err.dupItem': 'Two items are named "{name}". Give each item its own name.',
   'err.saveFailed': 'Saving failed: {detail}',
   'footer': 'IndexBoard is a free template. Results are the responsibility of each board author.',
 };
@@ -513,6 +515,8 @@ const zh: Record<MsgKey, string> = {
   'err.intervalOrder': '{item} / {metric}：区间必须包含分数（下限 ≤ 分数 ≤ 上限）。',
   'err.runs': '{item} / {metric}：运行次数必须是不小于 1 的整数。',
   'err.noItem': '请至少添加一个有名称的条目。',
+  'err.noScore': '发布前请至少填写一个分数。',
+  'err.dupItem': '有两个条目都叫“{name}”，请给每个条目起不同的名称。',
   'err.saveFailed': '保存失败：{detail}',
   footer: 'IndexBoard 是免费模板，结果内容由各榜单作者负责。',
 };
