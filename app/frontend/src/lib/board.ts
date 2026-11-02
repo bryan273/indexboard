@@ -220,7 +220,12 @@ export class ImportError extends Error {
 
 function toNum(v: unknown): number | null {
   if (v == null || v === '') return null;
-  const n = typeof v === 'number' ? v : Number(String(v).trim());
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  let t = String(v).trim().replace(/%$/, '').trim();
+  if (/^-?\d+,\d{1,2}$/.test(t)) t = t.replace(',', '.'); // 81,2 written with a decimal comma
+  else if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) t = t.replace(/,/g, ''); // 1,234.5 with thousands commas
+  if (t === '') return null;
+  const n = Number(t);
   return Number.isFinite(n) ? n : null;
 }
 
@@ -231,7 +236,9 @@ function splitUnit(header: string): { name: string; unit: string } {
 
 export function parseCsvRows(text: string): string[][] {
   const firstLine = text.split(/\r?\n/, 1)[0] ?? '';
-  const delim = firstLine.includes('\t') && !firstLine.includes(',') ? '\t' : ',';
+  const count = (c: string) => firstLine.split(c).length - 1;
+  // pick the delimiter the header actually uses: comma, semicolon (Excel in many locales) or tab
+  const delim = count('\t') > 0 && count('\t') >= count(',') && count('\t') >= count(';') ? '\t' : count(';') > count(',') ? ';' : ',';
   const rows: string[][] = [];
   let row: string[] = [];
   let cell = '';
@@ -263,10 +270,13 @@ export function parseCsvRows(text: string): string[][] {
 
 const SUFFIX = /^(.+?)[\s_\-.]+(low|lower|lo|ci_low|high|upper|hi|ci_high|runs|n)$/i;
 
+const MAX_IMPORT_ITEMS = 300;
+
 export function importCsv(text: string): { metrics: Metric[]; items: Item[] } {
   if (!text.trim()) throw new ImportError('imp.empty');
   const rows = parseCsvRows(text);
   if (rows.length < 2) throw new ImportError('imp.csvEmpty');
+  if (rows.length - 1 > MAX_IMPORT_ITEMS) throw new ImportError('imp.tooMany', String(MAX_IMPORT_ITEMS));
   const header = rows[0];
   const metrics: Metric[] = [];
   const byHeader = new Map<string, Metric>();
@@ -298,6 +308,7 @@ export function importCsv(text: string): { metrics: Metric[]; items: Item[] } {
     });
     return item;
   });
+  if (!items.some((it) => Object.values(it.scores).some((sc) => Number.isFinite(sc.value)))) throw new ImportError('imp.csvNoNumbers');
   return { metrics, items };
 }
 
