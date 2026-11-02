@@ -519,6 +519,13 @@ export function draftToDoc(d: Draft): { doc: BoardDoc | null; issues: DraftIssue
     items.push(item);
   });
   if (!items.length) issues.push({ key: 'err.noItem' });
+  const itemNames = new Set<string>();
+  items.forEach((it) => {
+    const k = it.name.toLowerCase();
+    if (itemNames.has(k)) issues.push({ key: 'err.dupItem', params: { name: it.name } });
+    itemNames.add(k);
+  });
+  if (items.length && !items.some((it) => Object.keys(it.scores).length > 0)) issues.push({ key: 'err.noScore' });
   if (issues.length) return { doc: null, issues };
 
   const { primary, cost } = resolveRoles(d.metrics, d.primary_metric_id, d.cost_metric_id);
