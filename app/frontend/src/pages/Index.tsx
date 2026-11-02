@@ -1,3 +1,4 @@
+import { FeatureBento, GradLast, type Feature } from '@/components/SuiteUI';
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import BoardCard from '@/components/board/BoardCard';
 import { getBoard, listRecentBoards, summarize, type BoardSummary } from '@/lib/boardApi';
@@ -58,6 +59,21 @@ const FAQ = {
   ],
 };
 
+const BOARD_POINTS: Record<'en' | 'zh', Feature[]> = {
+  en: [
+    { t: 'Ties are shown', p: 'When two scores overlap within their intervals, the board says so instead of forcing an order.', d: 'M4 8h16M4 16h16M8 4v16M16 4v16' },
+    { t: 'Intervals on every score', p: 'Each score can carry a 95% range and a run count, so a small gap is not mistaken for a win.', d: 'M5 12h14M5 8v8M19 8v8M12 9v6' },
+    { t: 'The method is written down', p: 'Formula, a worked example and what was held fixed sit next to the numbers.', d: 'M7 4h10a2 2 0 012 2v14l-4-3H7a2 2 0 01-2-2V6a2 2 0 012-2zM9 9h6M9 13h4' },
+    { t: 'Share a link, edit with a key', p: 'Publishing gives a read-only link and a private edit key. Describe it in words to start from a draft.', d: 'M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3A4 4 0 0010 18.7l1-1' },
+  ],
+  zh: [
+    { t: '平局会显示', p: '两个分数的区间重叠时，榜单会如实标明，而不是硬排出名次。', d: 'M4 8h16M4 16h16M8 4v16M16 4v16' },
+    { t: '每个分数都有区间', p: '每个分数可附带 95% 区间和运行次数，避免把微小差距当成胜负。', d: 'M5 12h14M5 8v8M19 8v8M12 9v6' },
+    { t: '方法写在旁边', p: '计分公式、一个演算示例和固定条件都与数字放在一起。', d: 'M7 4h10a2 2 0 012 2v14l-4-3H7a2 2 0 01-2-2V6a2 2 0 012-2zM9 9h6M9 13h4' },
+    { t: '分享链接，凭密钥编辑', p: '发布后得到只读链接和私有编辑密钥。也可以用文字描述，从草稿开始。', d: 'M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3A4 4 0 0010 18.7l1-1' },
+  ],
+};
+
 export default function Index() {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
@@ -112,8 +128,8 @@ export default function Index() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <section className="grid gap-10 pb-14 pt-12 sm:pt-16 lg:grid-cols-12 lg:items-center lg:gap-12">
           <div className="min-w-0 lg:col-span-7">
-            <p className="text-[13px] font-medium uppercase tracking-[0.08em] text-primary">{t('home.eyebrow')}</p>
-            <h1 className="font-display mt-4 text-[38px] font-semibold leading-[1.08] sm:text-[52px]">{t('home.title')}</h1>
+            <span className="su-pill"><i />{t('home.eyebrow')}</span>
+            <h1 className="font-display mt-4 text-[38px] font-semibold leading-[1.08] sm:text-[52px]"><GradLast text={t('home.title')} words={3} /></h1>
             <p className="mt-5 max-w-xl text-[17px] leading-relaxed text-muted-foreground">{t('home.lead')}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg" className="h-11">
@@ -211,6 +227,14 @@ export default function Index() {
             </Button>
           </form>
         </section>
+
+        <FeatureBento
+          id="why"
+          eyebrow={lang === 'zh' ? '为什么用它' : 'Why IndexBoard'}
+          title={lang === 'zh' ? '排名要诚实，平局也要显示。' : 'Honest rankings show the ties.'}
+          lead={lang === 'zh' ? '每个榜单都写明评分方法，并带置信区间。' : 'Every board states how it scores and carries confidence intervals.'}
+          items={BOARD_POINTS[lang]}
+        />
 
         <SuiteFaq lang={lang} id="faq" items={FAQ[lang]} />
         <SuiteCta
