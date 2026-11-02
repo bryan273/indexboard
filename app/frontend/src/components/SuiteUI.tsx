@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ElementType, type ReactNode } from 'react';
 import './suite-ui.css';
 
 /** Fades and lifts its children in once they scroll into view. Without IntersectionObserver or with reduced motion it shows at once. */
@@ -151,5 +151,73 @@ export function FeatureBento({ id, eyebrow, title, lead, items }: { id?: string;
         ))}
       </div>
     </section>
+  );
+}
+
+export type Slide = { key: string; label: string; url: string; src: string; alt: string };
+
+/** Browser frame that cycles through several products. Pauses when hidden, off screen, hovered, or when the visitor picks a tab. */
+export function ShowcaseFrame({ slides, interval = 4500, chips }: { slides: Slide[]; interval?: number; chips?: (key: string) => ReactNode }) {
+  const [i, setI] = useState(0);
+  const [hold, setHold] = useState(false);
+  const [seen, setSeen] = useState(true);
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = box.current;
+    if (!el || !('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver((es) => setSeen(es[0].isIntersecting), { threshold: 0.25 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  useEffect(() => {
+    if (hold || !seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t = setInterval(() => {
+      if (!document.hidden) setI((n) => (n + 1) % slides.length);
+    }, interval);
+    return () => clearInterval(t);
+  }, [hold, seen, slides.length, interval]);
+  const cur = slides[i];
+  return (
+    <div className="su-stage" ref={box} onPointerEnter={() => setHold(true)} onPointerLeave={() => setHold(false)}>
+      <div className="su-frame">
+        <div className="su-bar" aria-hidden>
+          <b />
+          <b />
+          <b />
+          <span>{cur.url}</span>
+        </div>
+        <div className="su-slides">
+          {slides.map((s, k) => (
+            <img key={s.key} src={s.src} alt={k === i ? s.alt : ''} aria-hidden={k !== i} className={k === i ? 'on' : ''} width={1424} height={900} loading={k === 0 ? 'eager' : 'lazy'} decoding="async" />
+          ))}
+        </div>
+      </div>
+      {chips?.(cur.key)}
+      <div className="su-tabs" role="tablist" aria-label="Apps">
+        {slides.map((s, k) => (
+          <button key={s.key} type="button" role="tab" aria-selected={k === i} className={k === i ? 'on' : ''} onClick={() => { setI(k); setHold(true); }}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Labelled groups of plain chips: each group says what kind of thing the chips are. */
+export function ChipGroups({ groups }: { groups: { title: string; items: string[] }[] }) {
+  return (
+    <div className="su-groups">
+      {groups.map((g) => (
+        <div key={g.title}>
+          <p>{g.title}</p>
+          <ul>
+            {g.items.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
   );
 }
