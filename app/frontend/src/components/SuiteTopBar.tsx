@@ -89,7 +89,10 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
     return () => document.body.classList.remove('stb-lock');
   }, [open]);
 
-  const suiteLinks = SUITE.filter((s) => s.id !== appId && s.id !== 'agent');
+  const suiteLinks = [
+    ...(appId === 'explainer' ? [] : [{ id: 'explainer', label: 'Paper Explainer', href: EXPLAINER, en: 'Turn a paper into a short narrated video', zh: '把论文变成简短的解说视频' }]),
+    ...SUITE.filter((s) => s.id !== appId),
+  ];
 
   return (
     <>
