@@ -1,3 +1,5 @@
+import { shareLang } from '@/components/suiteLang';
+shareLang('indexboard.lang');
 import '@/components/suite-ui.css';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
