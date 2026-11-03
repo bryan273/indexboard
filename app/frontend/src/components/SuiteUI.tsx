@@ -170,7 +170,7 @@ export function ShowcaseFrame({ slides, interval = 4500, chips }: { slides: Slid
     return () => io.disconnect();
   }, []);
   useEffect(() => {
-    if (hold || !seen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (hold || !seen) return; // slides swap by a plain fade, so this runs even with reduced motion (CSS drops the fade itself)
     const t = setInterval(() => {
       if (!document.hidden) setI((n) => (n + 1) % slides.length);
     }, interval);
@@ -195,7 +195,7 @@ export function ShowcaseFrame({ slides, interval = 4500, chips }: { slides: Slid
       {chips?.(cur.key)}
       <div className="su-tabs" role="tablist" aria-label="Apps">
         {slides.map((s, k) => (
-          <button key={s.key} type="button" role="tab" aria-selected={k === i} className={k === i ? 'on' : ''} onClick={() => { setI(k); setHold(true); }}>
+          <button key={s.key} type="button" role="tab" aria-selected={k === i} className={k === i ? 'on' : ''} onClick={() => { setI(k); setHold(true); window.setTimeout(() => setHold(false), 12000); }}>
             {s.label}
           </button>
         ))}
