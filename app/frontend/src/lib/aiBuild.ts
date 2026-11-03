@@ -2,7 +2,7 @@ import { importJson, ImportError, type BoardDoc, type ImportedBoard, type LiveMe
 import { LIVE_METRIC_KEYS, buildLiveDoc, fetchModelData } from '@/lib/liveData';
 import type { Lang } from '@/lib/i18n';
 
-const GATEWAY = 'https://vzvyghmtsakixlhzzuol.supabase.co/functions/v1/agent-llm';
+const GATEWAY = 'https://wzdkroxbfrlqijbeiwpk.supabase.co/functions/v1/agent-llm';
 const VISITOR_KEY = 'indexboard.visitor';
 export const AI_MAX_CHARS = 12000;
 

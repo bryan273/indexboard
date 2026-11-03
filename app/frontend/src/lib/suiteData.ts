@@ -1,5 +1,5 @@
 // Saves and loads this app's data through the suite-data edge function (Supabase), so the app works on any static host.
-const URL = 'https://vzvyghmtsakixlhzzuol.supabase.co/functions/v1/suite-data';
+const URL = 'https://wzdkroxbfrlqijbeiwpk.supabase.co/functions/v1/suite-data';
 
 export class SuiteError extends Error {
   status: number;
