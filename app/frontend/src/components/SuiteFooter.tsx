@@ -4,7 +4,7 @@ import { SUITE, EXPLAINER, type Lang } from './SuiteTopBar';
 import './suite-topbar.css';
 
 const T = {
-  en: { apps: 'Apps', learn: 'Learn', check: 'Check', about: 'About', tag: 'Read a paper, then check its numbers.', made: 'Made at Tsinghua SIGS, AIID capstone, Group 1.', note: 'Results are produced by AI agents. Check the quoted sources before you rely on them.', top: 'Back to top', faq: 'Frequently asked', open: 'opens in a new tab' },
+  en: { apps: 'Apps', learn: 'Learn', check: 'Check', about: 'About', tag: 'Read a paper, then check its numbers.', made: 'Made at Tsinghua SIGS, AIID capstone, Group 1.', note: 'Results are produced by AI agents. Check the quoted sources before you rely on them.', top: 'Back to top', faq: 'Frequently asked', open: 'opens in the same tab' },
   zh: { apps: '应用', learn: '理解', check: '核验', about: '关于', tag: '读懂论文，再核验它的数字。', made: '清华深圳国际研究生院 AIID 课程项目，第 1 组。', note: '结果由 AI 智能体生成。引用前请核对原文出处。', top: '回到顶部', faq: '常见问题', open: '在新标签页打开' },
 } as const;
 
@@ -16,7 +16,7 @@ export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; 
     <nav className="sft-col" aria-label={title}>
       <h2>{title}</h2>
       {items.map((s) => (
-        <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer" aria-current={s.id === appId ? 'page' : undefined} className={s.id === appId ? 'on' : ''}>
+        <a key={s.id} href={s.href} aria-current={s.id === appId ? 'page' : undefined} className={s.id === appId ? 'on' : ''}>
           {s.label}
           <span className="sr-only"> ({t.open})</span>
         </a>
