@@ -38,7 +38,7 @@ export function SpotCard({ children, className = '', href, as }: { children: Rea
     e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
     e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
   };
-  const ext = href && /^https?:/.test(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+  const ext = href && /^https?:/.test(href) && !href.startsWith('https://bryan273.github.io/repro-suite') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
   return (
     <Tag className={`su-card ${className}`} href={href} onPointerMove={move} {...ext}>
       {children}

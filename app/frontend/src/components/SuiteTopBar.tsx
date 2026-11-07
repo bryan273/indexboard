@@ -31,7 +31,7 @@ export const EXPLAINER = 'https://bryan273.github.io/repro-suite/explainer';
 const AGENT = 'https://bryan273.github.io/repro-suite/repro/index.html';
 
 const T = {
-  en: { menu: 'Menu', suite: 'Paper Repro Suite', newTab: 'opens in a new tab', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', nw: 'New', here: 'you are here' },
+  en: { menu: 'Menu', suite: 'Paper Repro Suite', newTab: 'opens in the same tab', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', nw: 'New', here: 'you are here' },
   zh: { menu: '菜单', suite: 'Paper Repro Suite', newTab: '在新标签页打开', toLight: '切换到浅色模式', toDark: '切换到深色模式', nw: '新', here: '当前应用' },
 } as const;
 
@@ -115,9 +115,9 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
             {menu && (
               <div className="stb-menu" role="menu">
                 {suiteLinks.map((s) => (
-                  <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer" role="menuitem">
+                  <a key={s.id} href={s.href} role="menuitem">
                     <b>
-                      {s.label} <i>↗</i>
+                      {s.label} 
                     </b>
                     <span>{s[lang]}</span>
                   </a>
@@ -149,26 +149,26 @@ export default function SuiteTopBar({ appId, brand, letter, homeTo, nav, dark, o
           {appId !== 'explainer' && (
             <>
               <div className="stb-h">Learn</div>
-              <a className="stb-x" href={EXPLAINER} target="_blank" rel="noopener noreferrer">
+              <a className="stb-x" href={EXPLAINER}>
                 Paper Explainer
-                <em>↗</em>
+                
               </a>
             </>
           )}
           {appId !== 'agent' && (
             <>
               <div className="stb-h">Check</div>
-              <a className="stb-x" href={AGENT} target="_blank" rel="noopener noreferrer">
+              <a className="stb-x" href={AGENT}>
                 Paper Repro Agent
-                <em>↗</em>
+                
               </a>
             </>
           )}
           <div className="stb-h">{t.suite}</div>
           {suiteLinks.map((s) => (
-            <a key={s.id} href={s.href} target="_blank" rel="noopener noreferrer">
+            <a key={s.id} href={s.href}>
               {s.label}
-              <em>↗</em>
+              
             </a>
           ))}
         </div>
