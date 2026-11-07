@@ -1,5 +1,7 @@
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/Inter-400.woff2) format('woff2')}
 @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:300 700;font-display:swap;src:url(/fonts/SpaceGrotesk-500.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:200 800;font-display:swap;src:url(/fonts/Newsreader.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-style:italic;font-weight:200 800;font-display:swap;src:url(/fonts/Newsreader-Italic.woff2) format('woff2')}
 @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url(/fonts/JetBrainsMono-400.woff2) format('woff2')}
 
 @tailwind base;
@@ -8,26 +10,26 @@
 
 @layer base {
   :root {
-    --background: 43 22% 96%;
-    --foreground: 240 14% 10%;
+    --background: 48 40% 97%;
+    --foreground: 43 21% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 240 14% 10%;
+    --card-foreground: 43 21% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 240 14% 10%;
-    --primary: 247 100% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 43 20% 93%;
-    --secondary-foreground: 240 14% 10%;
-    --muted: 43 20% 93%;
-    --muted-foreground: 240 7% 39%;
-    --accent: 257 100% 96%;
-    --accent-foreground: 247 72% 50%;
+    --popover-foreground: 43 21% 8%;
+    --primary: 43 21% 8%;
+    --primary-foreground: 48 40% 97%;
+    --secondary: 48 24% 92%;
+    --secondary-foreground: 43 21% 8%;
+    --muted: 48 24% 92%;
+    --muted-foreground: 46 7% 33%;
+    --accent: 48 24% 92%;
+    --accent-foreground: 228 76% 47%;
     --destructive: 0 66% 47%;
     --destructive-foreground: 0 0% 100%;
     --success: 142 72% 29%;
-    --border: 46 17% 88%;
-    --input: 46 17% 88%;
-    --ring: 247 100% 65%;
+    --border: 45 23% 88%;
+    --input: 45 20% 82%;
+    --ring: 228 76% 47%;
     --radius: 0.75rem;
     --warn-bg: 33 100% 96%;
     --warn-fg: 26 90% 37%;
@@ -44,26 +46,26 @@
   }
 
   .dark {
-    --background: 240 25% 5%;
-    --foreground: 240 25% 96%;
-    --card: 240 20% 9%;
-    --card-foreground: 240 25% 96%;
-    --popover: 240 20% 9%;
-    --popover-foreground: 240 25% 96%;
-    --primary: 246 100% 76%;
-    --primary-foreground: 240 25% 5%;
-    --secondary: 240 17% 12%;
-    --secondary-foreground: 240 25% 96%;
-    --muted: 240 17% 12%;
-    --muted-foreground: 240 12% 69%;
-    --accent: 244 42% 19%;
-    --accent-foreground: 246 100% 76%;
+    --background: 45 12% 6%;
+    --foreground: 45 33% 93%;
+    --card: 48 11% 10%;
+    --card-foreground: 45 33% 93%;
+    --popover: 48 11% 10%;
+    --popover-foreground: 45 33% 93%;
+    --primary: 45 33% 93%;
+    --primary-foreground: 45 12% 6%;
+    --secondary: 43 10% 13%;
+    --secondary-foreground: 45 33% 93%;
+    --muted: 43 10% 13%;
+    --muted-foreground: 46 6% 64%;
+    --accent: 43 10% 13%;
+    --accent-foreground: 228 100% 81%;
     --destructive: 0 72% 64%;
     --destructive-foreground: 240 12% 5%;
     --success: 142 55% 52%;
-    --border: 240 16% 17%;
-    --input: 240 16% 17%;
-    --ring: 246 100% 76%;
+    --border: 45 8% 16%;
+    --input: 45 8% 22%;
+    --ring: 228 100% 81%;
     --warn-bg: 32 50% 11%;
     --warn-fg: 32 84% 68%;
     --warn-border: 34 63% 22%;
@@ -185,9 +187,11 @@
 }
 
 
-/* suite v3 glow: warm paper background with a soft violet, cyan and peach wash */
-body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: radial-gradient(55% 45% at 86% -8%, hsl(var(--primary) / 0.15), transparent 70%),
-              radial-gradient(40% 35% at 4% 6%, rgba(34, 195, 238, 0.11), transparent 70%),
-              radial-gradient(35% 30% at 60% 100%, rgba(255, 180, 138, 0.10), transparent 70%); }
 h1, h2, h3, .font-display { font-family: 'Space Grotesk', 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif; letter-spacing: -0.03em; }
+
+
+/* design v4: paper, ink, one highlighter. Serif display, flat surfaces, verdict colours only for verdicts. */
+:root { --serif: 'Newsreader', 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif; --stb-bg: hsl(var(--background)); --stb-fg: hsl(var(--foreground)); }
+h1, h2, .font-display { font-family: var(--serif) !important; font-weight: 400 !important; letter-spacing: -0.022em !important; }
+h3 { font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; letter-spacing: -0.005em; }
+:lang(zh-CN) h1, :lang(zh-CN) h2 { letter-spacing: 0 !important; }
