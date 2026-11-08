@@ -28,7 +28,7 @@ export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; 
       <div className="sft-in">
         <div className="sft-brand">
           <span className="stb-logo" aria-hidden>R</span>
-          <b>Repro Suite</b>
+          <b>Paperlit</b>
           <p>{t.tag}</p>
           <small>{t.made}</small>
         </div>

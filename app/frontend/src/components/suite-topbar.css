@@ -237,3 +237,10 @@ a.card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px rgba(6
 .stb-chips a:hover { border-color: var(--stb-primary, hsl(var(--primary))); color: var(--stb-primary, hsl(var(--primary))); }
 @media (max-width: 900px) { .stb-apps-wrap { display: block; } .stb-apps span { display: none; } .stb-apps { padding: 0; width: 38px; justify-content: center; } }
 @media (max-width: 520px) { .stb-act > .stb-apps-wrap { display: block; } }
+
+html[lang='vi'] .stb, html[lang='vi'] .stb *, html[lang='vi'] .stb-menu *, html[lang='vi'] .stb-sheet * { font-family: 'Be Vietnam Pro', 'Segoe UI', 'Noto Sans', Roboto, Arial, system-ui, sans-serif !important; }
+
+/* one brand for the whole suite: the left stays "Paper Suite" and leads to the landing page; the feature you are in sits next to it */
+.stb-brand { margin-right: 6px; }
+.stb-here { display: inline-flex; align-items: center; gap: 10px; margin-right: 10px; padding-left: 12px; border-left: 1px solid var(--stb-border, hsl(var(--border))); color: var(--stb-mutedfg, hsl(var(--muted-foreground))); font: 600 14px 'Inter', 'Noto Sans SC', sans-serif; white-space: nowrap; }
+@media (max-width: 700px) { .stb-here { display: none; } }
