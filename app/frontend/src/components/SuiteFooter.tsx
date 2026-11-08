@@ -30,7 +30,6 @@ export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; 
           <span className="stb-logo" aria-hidden>R</span>
           <b>Paperlit</b>
           <p>{t.tag}</p>
-          <small>{t.made}</small>
         </div>
         {col(t.learn, [{ id: 'explainer', label: 'Paper Explainer', href: EXPLAINER }, ...pick(['companion'])])}
         {col(t.check, pick(['agent', 'lite', 'desk', 'indexboard']))}

@@ -56,10 +56,10 @@ const PRODUCTS: Product[] = [
 ];
 
 const T = {
-  en: { menu: 'Menu', more: 'More', apps: 'Apps', tools: 'More from Paperlit', settings: 'Settings', suiteName: 'What you can do with a paper', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
-  zh: { menu: '菜单', more: '更多', apps: '应用', tools: 'Paperlit 的更多功能', settings: '设置', suiteName: '你可以用论文做什么', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
-  vi: { menu: 'Menu', more: 'Thêm', apps: 'Ứng dụng', tools: 'Thêm từ Paperlit', settings: 'Cài đặt', suiteName: 'Bạn có thể làm gì với một bài báo', toLight: 'Chuyển sang giao diện sáng', toDark: 'Chuyển sang giao diện tối', here: 'trang này', onPage: 'Trên trang này' },
-  id: { menu: 'Menu', more: 'Lainnya', apps: 'Aplikasi', tools: 'Lainnya dari Paperlit', settings: 'Pengaturan', suiteName: 'Yang bisa Anda lakukan dengan makalah', toLight: 'Beralih ke tema terang', toDark: 'Beralih ke tema gelap', here: 'halaman ini', onPage: 'Di halaman ini' },
+  en: { menu: 'Menu', more: 'More', apps: 'Apps', tools: 'Apps', settings: 'Settings', suiteName: 'What you can do with a paper', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
+  zh: { menu: '菜单', more: '更多', apps: '应用', tools: '应用', settings: '设置', suiteName: '你可以用论文做什么', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
+  vi: { menu: 'Menu', more: 'Thêm', apps: 'Ứng dụng', tools: 'Ứng dụng', settings: 'Cài đặt', suiteName: 'Bạn có thể làm gì với một bài báo', toLight: 'Chuyển sang giao diện sáng', toDark: 'Chuyển sang giao diện tối', here: 'trang này', onPage: 'Trên trang này' },
+  id: { menu: 'Menu', more: 'Lainnya', apps: 'Aplikasi', tools: 'Aplikasi', settings: 'Pengaturan', suiteName: 'Yang bisa Anda lakukan dengan makalah', toLight: 'Beralih ke tema terang', toDark: 'Beralih ke tema gelap', here: 'halaman ini', onPage: 'Di halaman ini' },
 } as const;
 
 function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
