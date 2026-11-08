@@ -43,7 +43,7 @@ const R = ROOT;
 type L4 = { en: string; zh: string; vi: string; id: string };
 type Product = { id: string; ids: string[]; href: string; mark: string; n: L4; d: L4 };
 /** The suite as three products, not eight apps: make a video, read a paper, check whether its result holds. */
-const PRODUCTS: Product[] = [
+export const PRODUCTS: Product[] = [
   { id: 'explain', ids: ['explainer'], href: `${R}/explainer/`, mark: '▶',
     n: { en: 'Learn by video', zh: '看视频学论文', vi: 'Học qua video', id: 'Belajar lewat video' },
     d: { en: 'Drop in a paper or PDF. Get a short video that teaches it.', zh: '丢进论文或 PDF，得到讲解它的短视频。', vi: 'Thả bài báo hoặc PDF vào. Nhận video ngắn giảng giải.', id: 'Masukkan makalah atau PDF. Dapatkan video singkat yang mengajarkannya.' } },

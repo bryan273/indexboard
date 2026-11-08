@@ -1,22 +1,23 @@
 import { useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { SUITE, EXPLAINER, type Lang } from './SuiteTopBar';
+import { PRODUCTS, type Lang } from './SuiteTopBar';
 import './suite-topbar.css';
 
 const T = {
-  en: { apps: 'Apps', learn: 'Learn', check: 'Check', about: 'About', tag: 'Read a paper, then check its numbers.', made: 'Made at Tsinghua SIGS, AIID capstone, Group 1.', note: 'Results are produced by AI agents. Check the quoted sources before you rely on them.', top: 'Back to top', faq: 'Frequently asked', open: 'opens in the same tab' },
-  zh: { apps: '应用', learn: '理解', check: '核验', about: '关于', tag: '读懂论文，再核验它的数字。', made: '清华深圳国际研究生院 AIID 课程项目，第 1 组。', note: '结果由 AI 智能体生成。引用前请核对原文出处。', top: '回到顶部', faq: '常见问题', open: '在新标签页打开' },
+  en: { apps: 'Paperlit', about: 'About', home: 'Home', tag: 'Turn papers into videos, read with citations, check the numbers.', note: 'Results are produced by AI agents. Check the quoted sources before you rely on them.', top: 'Back to top', faq: 'Frequently asked', open: 'opens in the same tab', terms: 'Terms', privacy: 'Privacy' },
+  zh: { apps: 'Paperlit', about: '关于', home: '首页', tag: '把论文变成视频，带引用地阅读，核验它的数字。', note: '结果由 AI 智能体生成。引用前请核对原文出处。', top: '回到顶部', faq: '常见问题', open: '在新标签页打开', terms: '条款', privacy: '隐私' },
+  vi: { apps: 'Paperlit', about: 'Giới thiệu', home: 'Trang chủ', tag: 'Biến bài báo thành video, đọc kèm trích dẫn, kiểm chứng số liệu.', note: 'Kết quả do tác tử AI tạo ra. Hãy kiểm tra các nguồn được trích dẫn trước khi dựa vào.', top: 'Lên đầu trang', faq: 'Câu hỏi thường gặp', open: 'mở trong cùng tab', terms: 'Điều khoản', privacy: 'Quyền riêng tư' },
+  id: { apps: 'Paperlit', about: 'Tentang', home: 'Beranda', tag: 'Ubah makalah menjadi video, baca dengan sitasi, periksa angkanya.', note: 'Hasil dibuat oleh agen AI. Periksa sumber yang dikutip sebelum Anda mengandalkannya.', top: 'Kembali ke atas', faq: 'Pertanyaan yang sering diajukan', open: 'dibuka di tab yang sama', terms: 'Ketentuan', privacy: 'Privasi' },
 } as const;
 
 /** Four-column footer shared by every app of the suite. */
 export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; note?: string }) {
   const t = T[lang];
-  const pick = (ids: string[]) => SUITE.filter((s) => ids.includes(s.id));
-  const col = (title: string, items: { label: string; href: string; id: string }[]) => (
+  const col = (title: string, items: { label: string; href: string; id: string; ids?: string[] }[]) => (
     <nav className="sft-col" aria-label={title}>
       <h2>{title}</h2>
       {items.map((s) => (
-        <a key={s.id} href={s.href} aria-current={s.id === appId ? 'page' : undefined} className={s.id === appId ? 'on' : ''}>
+        <a key={s.id} href={s.href} aria-current={s.ids?.includes(appId) ? 'page' : undefined} className={s.ids?.includes(appId) ? 'on' : ''}>
           {s.label}
           <span className="sr-only"> ({t.open})</span>
         </a>
@@ -31,12 +32,12 @@ export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; 
           <b>Paperlit</b>
           <p>{t.tag}</p>
         </div>
-        {col(t.learn, [{ id: 'explainer', label: 'Paper Explainer', href: EXPLAINER }, ...pick(['companion'])])}
-        {col(t.check, pick(['agent', 'lite', 'desk', 'indexboard']))}
-        {col(t.about, pick(['bench', 'hub']))}
+        {col(t.apps, PRODUCTS.map((pr) => ({ id: pr.id, ids: pr.ids, label: pr.n[lang] ?? pr.n.en, href: pr.href })))}
+        {col(t.about, [{ id: 'hub', label: t.home, href: 'https://bryan273.github.io/repro-suite/hub/' }, { id: 'terms', label: t.terms, href: 'https://bryan273.github.io/repro-suite/explainer/terms' }, { id: 'privacy', label: t.privacy, href: 'https://bryan273.github.io/repro-suite/explainer/privacy' }])}
       </div>
       <div className="sft-bar">
         <span>{note ?? t.note}</span>
+        <span className="sft-copy">&copy; {new Date().getFullYear()} Paperlit. {({ en: 'All rights reserved.', zh: '版权所有。', vi: 'Bảo lưu mọi quyền.', id: 'Hak cipta dilindungi.' } as Record<string, string>)[lang] ?? 'All rights reserved.'}</span>
         <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t.top} ↑</a>
       </div>
     </footer>
