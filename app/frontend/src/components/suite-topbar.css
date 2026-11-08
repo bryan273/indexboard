@@ -12,7 +12,7 @@
 .stb-nav > a:hover, .stb-suite > button:hover, .stb-suite > button[aria-expanded='true'] { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); }
 .stb-nav > a.on { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); font-weight: 600; }
 /* an app with many own links keeps the two quick links inside the Suite menu until the bar is wide enough */
-@media (max-width: 1560px) { .stb-dense > a.stb-x { display: none; } }
+.stb-dense > a.stb-x { display: none; }
 .stb-sep { width: 1px; height: 18px; background: var(--stb-border, hsl(var(--border))); margin: 0 8px; }
 .stb-new { font: 700 10px 'Inter', sans-serif; letter-spacing: 0.04em; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; background: linear-gradient(135deg, #5b4bff, #ff7a59); color: #fff; }
 .stb-suite { position: relative; }
@@ -143,6 +143,17 @@ a.card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px rgba(6
 .sft-bar a { display: inline-flex; align-items: center; min-height: 32px; }
 .stb-brand { min-height: 40px; }
 
+/* 404 page */
+.sfn-page { min-height: 100vh; display: flex; flex-direction: column; background: hsl(var(--background)); color: hsl(var(--foreground)); }
+.sfn { flex: 1; display: grid; place-content: center; justify-items: center; text-align: center; gap: 12px; padding: 96px 20px 24px; font-family: 'Inter', 'Noto Sans SC', system-ui, sans-serif; }
+.sfn .sfn-code { margin: 0; font: 700 clamp(72px, 14vw, 132px)/1 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.04em; background: linear-gradient(135deg, hsl(var(--primary)), #ff7a59); -webkit-background-clip: text; background-clip: text; color: transparent; max-width: none; }
+.sfn h1 { margin: 0; font: 700 clamp(24px, 4vw, 34px)/1.2 'Space Grotesk', 'Inter', sans-serif; letter-spacing: -0.02em; }
+.sfn p { margin: 0; max-width: 46ch; color: hsl(var(--muted-foreground)); line-height: 1.6; }
+.sfn-act { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; margin-top: 16px; }
+.sfn-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); box-shadow: 0 8px 22px -8px hsl(var(--primary) / .6); }
+.sfn-link { color: hsl(var(--foreground)); font-weight: 600; text-decoration: underline; text-underline-offset: 4px; min-height: 44px; display: inline-flex; align-items: center; }
+.sfn-link:hover { color: hsl(var(--primary)); }
+
 /* one navbar for the whole suite: a fixed row of features, and a thin row for the links of the page you are on */
 .stb { height: auto; display: block; padding: 0; gap: 0; }
 .stb-row { height: 62px; display: flex; align-items: center; gap: 6px; padding: 0 max(18px, calc((100vw - 1160px) / 2)); }
@@ -166,3 +177,63 @@ a.card:hover { transform: translateY(-2px); box-shadow: 0 16px 34px -16px rgba(6
   .stb-sub { padding: 0 10px; }
 }
 @media (max-width: 520px) { .stb-row { height: 56px; padding: 0 12px; gap: 4px; } .stb-sheet { top: 56px; } }
+
+/* one row: brand, this app's own sections, then apps menu + theme + language + account */
+.stb { height: auto; display: block; }
+.stb-row { height: 62px; }
+.stb-own { display: flex; align-items: center; gap: 2px; min-width: 0; margin-left: 6px; }
+.stb-own > a { padding: 8px 12px; border-radius: 999px; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); font: 500 14px 'Inter', 'Noto Sans SC', sans-serif; text-decoration: none; white-space: nowrap; }
+.stb-own > a:hover { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); }
+.stb-own > a.on { color: var(--stb-fg, hsl(var(--foreground))); background: var(--stb-soft, hsl(var(--muted))); font-weight: 600; }
+.stb-apps { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px; border-radius: 999px; border: 1px solid var(--stb-border, hsl(var(--border))); background: var(--stb-card, hsl(var(--card))); color: var(--stb-fg, hsl(var(--foreground))); font: 500 13.5px 'Inter', 'Noto Sans SC', sans-serif; cursor: pointer; }
+.stb-apps:hover, .stb-apps[aria-expanded='true'] { border-color: var(--stb-primary, hsl(var(--primary))); }
+.stb-menu { grid-template-columns: 1fr; width: min(340px, 92vw); gap: 2px; }
+.stb-menu-h { margin: 2px 13px 6px; font: 600 12px 'Inter', sans-serif; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); }
+.stb-menu a.on { background: var(--stb-soft, hsl(var(--muted))); }
+.stb-menu a.on b::after { content: ' (here)'; font-weight: 400; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); }
+@media (max-width: 900px) { .stb-own { display: none; } .stb-burger { display: grid; } .stb-apps span { display: none; } .stb-apps { width: 36px; padding: 0; justify-content: center; } }
+@media (max-width: 760px) { .stb-menu { top: 64px; } }
+@media (max-width: 520px) { .stb-apps, .stb-act > .stb-ic[aria-label='Settings'], .stb-act > .stb-ic[aria-label='设置'] { display: none; } .stb-brand b { font-size: 14px; } }
+.stb-sheet-btn { display: flex; align-items: center; padding: 13px 12px; border-radius: 12px; border: 0; background: none; color: var(--stb-fg, hsl(var(--foreground))); font: 500 16px 'Inter', 'Noto Sans SC', sans-serif; text-align: left; cursor: pointer; }
+.stb-sheet-btn:hover { background: var(--stb-soft, hsl(var(--muted))); }
+
+/* navbar v2: square icon buttons, one language menu, apps as a grid icon */
+.stb-act { gap: 6px; }
+.stb-ic { width: 38px; height: 38px; border-radius: 12px; border-color: transparent; background: transparent; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); }
+.stb-ic:hover, .stb-ic[aria-expanded='true'] { background: var(--stb-soft, hsl(var(--muted))); color: var(--stb-fg, hsl(var(--foreground))); border-color: transparent; }
+.stb-lang { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 11px; border-radius: 12px; border: 0; background: transparent; cursor: pointer; color: var(--stb-mutedfg, hsl(var(--muted-foreground))); font: 600 13px 'Inter', 'Noto Sans SC', sans-serif; }
+.stb-lang:hover, .stb-lang[aria-expanded='true'] { background: var(--stb-soft, hsl(var(--muted))); color: var(--stb-fg, hsl(var(--foreground))); }
+.stb-menu { border-radius: 16px; padding: 8px; width: min(330px, 92vw); }
+.stb-menu a { grid-template-columns: 34px 1fr auto; align-items: center; gap: 12px; padding: 9px 10px; }
+.stb-tile { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font: 700 15px 'Space Grotesk', 'Inter', sans-serif; color: var(--stb-primary, hsl(var(--primary))); background: color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 12%, transparent); }
+.stb-mt { display: grid; gap: 1px; min-width: 0; }
+.stb-menu a.on b::after { content: none; }
+.stb-menu a.on { background: color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 8%, transparent); }
+.stb-tick { color: var(--stb-primary, hsl(var(--primary))); }
+.stb-langmenu { width: 220px; gap: 1px; }
+.stb-langmenu button { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 0; border-radius: 10px; background: none; cursor: pointer; color: var(--stb-fg, hsl(var(--foreground))); font: 500 14.5px 'Inter', 'Noto Sans SC', sans-serif; text-align: left; }
+.stb-langmenu button:hover, .stb-langmenu button.on { background: var(--stb-soft, hsl(var(--muted))); }
+.stb-langmenu button.on { color: var(--stb-primary, hsl(var(--primary))); font-weight: 600; }
+.stb-sheet-langs { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+.stb-sheet-langs button { padding: 9px 14px; border-radius: 999px; border: 1px solid var(--stb-border, hsl(var(--border))); background: none; color: var(--stb-fg, hsl(var(--foreground))); font: 500 14px 'Inter', sans-serif; cursor: pointer; }
+.stb-sheet-langs button.on { border-color: var(--stb-primary, hsl(var(--primary))); color: var(--stb-primary, hsl(var(--primary))); font-weight: 600; }
+@media (max-width: 900px) { .stb-apps-wrap { display: none; } }
+@media (max-width: 520px) { .stb-act > .stb-gear { display: none; } .stb-lang span { display: none; } }
+
+/* the tools entry: a labelled pill that is noticed once, then calm */
+.stb-apps { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 14px 0 12px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 35%, transparent); background: color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 9%, transparent); color: var(--stb-primary, hsl(var(--primary))); font: 600 13.5px 'Inter', 'Noto Sans SC', sans-serif; cursor: pointer; position: relative; white-space: nowrap; }
+.stb-apps:hover, .stb-apps[aria-expanded='true'] { background: color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 16%, transparent); }
+.stb-dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: #ff5a4d; box-shadow: 0 0 0 3px var(--stb-bg, hsl(var(--background))); animation: stb-ping 1.8s ease-out 3; }
+@keyframes stb-ping { 0% { box-shadow: 0 0 0 0 rgba(255,90,77,.6), 0 0 0 3px var(--stb-bg, hsl(var(--background))); } 100% { box-shadow: 0 0 0 10px rgba(255,90,77,0), 0 0 0 3px var(--stb-bg, hsl(var(--background))); } }
+.stb-apps span { display: inline; }
+.stb-products { width: min(380px, 94vw); gap: 6px; }
+.stb-prod { border-radius: 14px; padding: 2px; }
+.stb-prod.on { background: color-mix(in srgb, var(--stb-primary, hsl(var(--primary))) 8%, transparent); }
+.stb-prod > a { grid-template-columns: 38px 1fr; }
+.stb-prod .stb-tile { width: 38px; height: 38px; font-size: 16px; }
+.stb-mt b i { font-style: normal; font-weight: 500; color: var(--stb-primary, hsl(var(--primary))); }
+.stb-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 10px 10px 60px; }
+.stb-chips a { display: inline-flex; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--stb-border, hsl(var(--border))); font: 500 12.5px 'Inter', 'Noto Sans SC', sans-serif; color: var(--stb-fg, hsl(var(--foreground))); text-decoration: none; }
+.stb-chips a:hover { border-color: var(--stb-primary, hsl(var(--primary))); color: var(--stb-primary, hsl(var(--primary))); }
+@media (max-width: 900px) { .stb-apps-wrap { display: block; } .stb-apps span { display: none; } .stb-apps { padding: 0; width: 38px; justify-content: center; } }
+@media (max-width: 520px) { .stb-act > .stb-apps-wrap { display: block; } }

@@ -3,7 +3,14 @@ import { Link } from 'react-router-dom';
 import './suite-topbar.css';
 
 export type NavLink = { label: string; to?: string; href?: string; onClick?: () => void; active?: boolean };
-export type Lang = 'en' | 'zh';
+export type Lang = 'en' | 'zh' | 'vi' | 'id';
+/** Every language the page speaks, with the name written in that language. */
+export const LANGUAGES: { id: Lang; name: string; short: string }[] = [
+  { id: 'en', name: 'English', short: 'EN' },
+  { id: 'zh', name: '中文', short: '中文' },
+  { id: 'vi', name: 'Tiếng Việt', short: 'VI' },
+  { id: 'id', name: 'Bahasa Indonesia', short: 'ID' },
+];
 
 type Props = {
   /** current app, one of: lite, companion, indexboard, desk, explainer, hub, agent */
@@ -12,31 +19,38 @@ type Props = {
   letter?: string;
   homeTo?: string;
   nav: NavLink[];
-  dark: boolean;
-  onToggleDark: () => void;
+  dark?: boolean;
+  onToggleDark?: () => void;
   lang: Lang;
-  onLang: (l: Lang) => void;
+  onLang(l: Lang): void;
+  /** the languages this app speaks; the suite apps default to English and Chinese */
+  languages?: Lang[];
+  onSettings?: () => void;
 };
 
 const ROOT = 'https://bryan273.github.io/repro-suite';
 type Feature = { id: string; href: string; en: string; zh: string; hEn: string; hZh: string; more?: boolean };
 /** The features of one product. Every app shows the same list, so moving between them feels like moving between tabs of one site. */
 export const FEATURES: Feature[] = [
-  { id: 'explainer', href: `${ROOT}/explainer/`, en: 'Explain', zh: '解说', hEn: 'Turn a paper into a short video and ask it questions', hZh: '把论文变成短视频，并可随时提问' },
-  { id: 'agent', href: `${ROOT}/repro/index.html`, en: 'Check', zh: '复现', hEn: 'Re-run a paper and see whether the number holds', hZh: '重新运行论文，看数字是否成立' },
-  { id: 'lite', href: `${ROOT}/lite/`, en: 'Quick check', zh: '快速核验', hEn: 'Check one claim in your browser', hZh: '在浏览器里核验一个结论' },
-  { id: 'companion', href: `${ROOT}/reading/`, en: 'Read', zh: '阅读', hEn: 'Read arXiv papers with cited answers', hZh: '阅读 arXiv 论文，答案带引用' },
-  { id: 'indexboard', href: `${ROOT}/indexboard/`, en: 'Boards', zh: '榜单', hEn: 'Honest leaderboards with ties', hZh: '如实呈现并列的排行榜' },
-  { id: 'desk', href: `${ROOT}/desk/`, en: 'Human check', zh: '人工核对', hEn: 'Ask for a human-checked reproduction', hZh: '申请人工核对的复现', more: true },
-  { id: 'bench', href: `${ROOT}/repro/bench.html`, en: 'Benchmark', zh: '基准', hEn: 'Six models, 32 papers', hZh: '6 个模型，32 篇论文', more: true },
-  { id: 'hub', href: `${ROOT}/hub/`, en: 'Overview', zh: '总览', hEn: 'The Repro Suite home', hZh: 'Repro Suite 首页', more: true },
+  { id: 'explainer', href: `${ROOT}/explainer/`, en: 'Explain a paper', zh: '讲解论文', hEn: 'Turn a paper into a short video you can pause, question and quiz yourself on', hZh: '把论文变成可暂停、可提问、可自测的短视频' },
+  { id: 'companion', href: `${ROOT}/reading/`, en: 'Read a paper', zh: '阅读论文', hEn: 'Read an arXiv paper with answers that cite the page', hZh: '阅读 arXiv 论文，答案标注原文页码' },
+  { id: 'agent', href: `${ROOT}/repro/index.html`, en: 'Reproduce a paper', zh: '复现论文', hEn: 'An AI agent re-runs the paper\'s experiment and tells you if the result really holds', hZh: 'AI 智能体重新运行论文实验，告诉你结果是否真的成立' },
 ];
 export const SUITE = FEATURES.map((f) => ({ id: f.id, label: f.en, href: f.href, en: f.hEn, zh: f.hZh }));
 export const EXPLAINER = `${ROOT}/explainer`;
 
+const R = ROOT;
+type Product = { id: string; ids: string[]; href: string; mark: string; en: string; zh: string; hEn: string; hZh: string; chips?: { href: string; en: string; zh: string }[] };
+/** The suite as three products, not eight apps: make a video, read a paper, check whether its result holds. */
+const PRODUCTS: Product[] = [
+  { id: 'explain', ids: ['explainer'], href: `${R}/explainer/`, mark: '▶', en: 'Explain a paper', zh: '讲解论文', hEn: 'Turn a paper into a short video you can pause, question and quiz yourself on', hZh: '把论文变成可暂停、可提问、可自测的短视频' },
+  { id: 'read', ids: ['companion'], href: `${R}/reading/`, mark: '❝', en: 'Read a paper', zh: '阅读论文', hEn: 'Read an arXiv paper with answers that cite the page', hZh: '阅读 arXiv 论文，答案标注原文页码' },
+  { id: 'repro', ids: ['agent', 'lite', 'desk', 'indexboard', 'hub'], href: `${R}/repro/index.html`, mark: '↻', en: 'Reproduce a paper', zh: '复现论文', hEn: 'An AI agent re-runs the paper\'s experiment and tells you if the result really holds', hZh: 'AI 智能体重新运行论文实验，告诉你结果是否真的成立' },
+];
+
 const T = {
-  en: { menu: 'Menu', more: 'More', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
-  zh: { menu: '菜单', more: '更多', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
+  en: { menu: 'Menu', more: 'More', apps: 'Apps', tools: 'Read · Reproduce', settings: 'Settings', suiteName: 'Three ways to work with a paper', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
+  zh: { menu: '菜单', more: '更多', apps: '应用', tools: '阅读 · 复现', settings: '设置', suiteName: '处理论文的三种方式', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
 } as const;
 
 function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
@@ -64,8 +78,13 @@ function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
   );
 }
 
-export default function SuiteTopBar({ appId, nav, dark, onToggleDark, lang, onLang }: Props) {
-  const t = T[lang];
+export default function SuiteTopBar({ appId, brand, letter, nav, lang, onLang, onSettings, languages }: Props) {
+  const t = T[lang === 'zh' ? 'zh' : 'en'];
+  const zh = lang === 'zh';
+  const [langOpen, setLangOpen] = useState(false);
+  const [nudge, setNudge] = useState(() => { try { return localStorage.getItem('stb-tools-seen') !== '1'; } catch { return false; } });
+  const seen = () => { setNudge(false); try { localStorage.setItem('stb-tools-seen', '1'); } catch { /* private mode */ } };
+  const langRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -74,10 +93,12 @@ export default function SuiteTopBar({ appId, nav, dark, onToggleDark, lang, onLa
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setMenu(false);
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setMenu(false);
+        setLangOpen(false);
         setOpen(false);
       }
     };
@@ -94,77 +115,93 @@ export default function SuiteTopBar({ appId, nav, dark, onToggleDark, lang, onLa
     return () => document.body.classList.remove('stb-lock');
   }, [open]);
 
-  const main = FEATURES.filter((f) => !f.more);
-  const more = FEATURES.filter((f) => f.more);
-  const moreActive = more.some((f) => f.id === active);
   const hasSub = nav.length > 0;
 
   return (
     <>
       <header className="stb" data-open={open} data-sub={hasSub}>
         <div className="stb-row">
-          <a href={`${ROOT}/hub/`} className="stb-brand" onClick={() => setOpen(false)}>
-            <span className="stb-logo" aria-hidden>R</span>
-            <b>Repro Suite</b>
+          <a href={hasSub ? '#top' : `${ROOT}/hub/`} className="stb-brand" onClick={() => setOpen(false)}>
+            <span className="stb-logo" aria-hidden>{letter ?? 'R'}</span>
+            <b>{brand ?? 'Repro Suite'}</b>
           </a>
 
-          <nav className="stb-nav" aria-label="Repro Suite">
-            {main.map((f) => (
-              <a key={f.id} href={f.href} className={f.id === active ? 'on' : ''} aria-current={f.id === active ? 'page' : undefined}>
-                {f[lang]}
-              </a>
-            ))}
-            <div className="stb-suite" ref={ref}>
-              <button type="button" className={moreActive ? 'on' : ''} aria-expanded={menu} onClick={() => setMenu((v) => !v)}>
-                {t.more} <span aria-hidden>▾</span>
+          {hasSub && (
+            <nav className="stb-own" aria-label={t.onPage}>
+              {nav.map((l) => (
+                <NavItem key={l.label} l={l} onDone={() => undefined} />
+              ))}
+            </nav>
+          )}
+
+          <div className="stb-act">
+            <div className="stb-suite stb-apps-wrap" ref={ref}>
+              <button type="button" className={`stb-apps${nudge ? ' nudge' : ''}`} aria-expanded={menu} aria-haspopup="menu" aria-label={t.suiteName} onClick={() => { setMenu((v) => !v); setLangOpen(false); seen(); }}>
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden><g fill="currentColor"><circle cx="6" cy="6" r="1.9" /><circle cx="12" cy="6" r="1.9" /><circle cx="18" cy="6" r="1.9" /><circle cx="6" cy="12" r="1.9" /><circle cx="12" cy="12" r="1.9" /><circle cx="18" cy="12" r="1.9" /><circle cx="6" cy="18" r="1.9" /><circle cx="12" cy="18" r="1.9" /><circle cx="18" cy="18" r="1.9" /></g></svg>
+                <span>{t.tools}</span>
+                {nudge && <i className="stb-dot" aria-hidden />}
               </button>
               {menu && (
-                <div className="stb-menu" role="menu">
-                  {more.map((f) => (
-                    <a key={f.id} href={f.href} role="menuitem">
-                      <b>{f[lang]}</b>
-                      <span>{lang === 'zh' ? f.hZh : f.hEn}</span>
-                    </a>
+                <div className="stb-menu stb-products" role="menu">
+                  <p className="stb-menu-h">{t.suiteName}</p>
+                  {PRODUCTS.map((pr) => (
+                    <div key={pr.id} className={`stb-prod${pr.ids.includes(active) ? ' on' : ''}`}>
+                      <a href={pr.href} role="menuitem" aria-current={pr.ids.includes(active) ? 'page' : undefined}>
+                        <span className="stb-tile" aria-hidden>{pr.mark}</span>
+                        <span className="stb-mt"><b>{pr[zh ? 'zh' : 'en']}{pr.ids.includes(active) ? <i> · {t.here}</i> : null}</b><span>{zh ? pr.hZh : pr.hEn}</span></span>
+                      </a>
+                      {pr.chips && (
+                        <div className="stb-chips">
+                          {pr.chips.map((c) => <a key={c.href} href={c.href} role="menuitem">{zh ? c.zh : c.en}</a>)}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
             </div>
-          </nav>
-
-          <div className="stb-act">
-            <button type="button" className="stb-ic" onClick={onToggleDark} aria-label={dark ? t.toLight : t.toDark} title={dark ? t.toLight : t.toDark}>
-              {dark ? '☀' : '☾'}
-            </button>
-            <button type="button" className="stb-pill" onClick={() => onLang(lang === 'en' ? 'zh' : 'en')} aria-label="Language">
-              {lang === 'en' ? '中文' : 'EN'}
-            </button>
+            <div className="stb-suite" ref={langRef}>
+              <button type="button" className="stb-lang" aria-expanded={langOpen} aria-haspopup="listbox" aria-label="Language" onClick={() => { setLangOpen((v) => !v); setMenu(false); }}>
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden><g fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18" /></g></svg>
+                <span>{LANGUAGES.find((x) => x.id === lang)?.short}</span>
+              </button>
+              {langOpen && (
+                <div className="stb-menu stb-langmenu" role="listbox" aria-label="Language">
+                  {LANGUAGES.filter((x) => (languages ?? ['en', 'zh']).includes(x.id)).map((x) => (
+                    <button key={x.id} type="button" role="option" aria-selected={x.id === lang} className={x.id === lang ? 'on' : ''} onClick={() => { onLang(x.id); setLangOpen(false); }}>
+                      <span>{x.name}</span>
+                      {x.id === lang && <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {onSettings && (
+              <button type="button" className="stb-ic stb-gear" onClick={onSettings} aria-label={t.settings} title={t.settings}>
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden><g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 14.5a1.6 1.6 0 0 0 .3 1.8l.1.1a1.9 1.9 0 1 1-2.7 2.7l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a1.9 1.9 0 1 1-3.8 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a1.9 1.9 0 1 1-2.7-2.7l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a1.9 1.9 0 1 1 0-3.8h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a1.9 1.9 0 1 1 2.7-2.7l.1.1a1.6 1.6 0 0 0 1.8.3h0a1.6 1.6 0 0 0 1-1.5V3a1.9 1.9 0 1 1 3.8 0v.1a1.6 1.6 0 0 0 1 1.5h0a1.6 1.6 0 0 0 1.8-.3l.1-.1a1.9 1.9 0 1 1 2.7 2.7l-.1.1a1.6 1.6 0 0 0-.3 1.8v0a1.6 1.6 0 0 0 1.5 1H21a1.9 1.9 0 1 1 0 3.8h-.1a1.6 1.6 0 0 0-1.5 1z" /></g></svg>
+              </button>
+            )}
             <button type="button" className="stb-ic stb-burger" onClick={() => setOpen((v) => !v)} aria-label={t.menu} aria-expanded={open}>
               {open ? '✕' : '☰'}
             </button>
           </div>
         </div>
-
-        {hasSub && (
-          <nav className="stb-sub" aria-label={t.onPage}>
-            {nav.map((l) => (
-              <NavItem key={l.label} l={l} onDone={() => undefined} />
-            ))}
-          </nav>
-        )}
       </header>
 
       {open && (
         <div className="stb-sheet" data-sub={hasSub}>
-          <div className="stb-h">Repro Suite</div>
-          {FEATURES.map((f) => (
-            <a key={f.id} href={f.href} className={f.id === active ? 'on' : ''} aria-current={f.id === active ? 'page' : undefined}>
-              {f[lang]}
-              <em>{lang === 'zh' ? f.hZh : f.hEn}</em>
-            </a>
-          ))}
           {hasSub && <div className="stb-h">{t.onPage}</div>}
           {nav.map((l) => (
             <NavItem key={l.label} l={l} onDone={() => setOpen(false)} />
+          ))}
+          <div className="stb-sheet-langs">{LANGUAGES.filter((x) => (languages ?? ['en', 'zh']).includes(x.id)).map((x) => <button key={x.id} type="button" className={x.id === lang ? 'on' : ''} onClick={() => onLang(x.id)}>{x.name}</button>)}</div>
+          {onSettings && <button type="button" className="stb-sheet-btn" onClick={() => { setOpen(false); onSettings(); }}>{t.settings}</button>}
+          <div className="stb-h">{t.suiteName}</div>
+          {FEATURES.map((f) => (
+            <a key={f.id} href={f.href} className={f.id === active ? 'on' : ''} aria-current={f.id === active ? 'page' : undefined}>
+              {f[zh ? 'zh' : 'en']}
+              <em>{zh ? f.hZh : f.hEn}</em>
+            </a>
           ))}
         </div>
       )}
