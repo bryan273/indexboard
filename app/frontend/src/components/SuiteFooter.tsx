@@ -37,6 +37,7 @@ export function SuiteFooter({ lang, appId, note }: { lang: Lang; appId: string; 
       </div>
       <div className="sft-bar">
         <span>{note ?? t.note}</span>
+        <span className="sft-copy">&copy; {new Date().getFullYear()} Paperlit. {({ en: 'All rights reserved.', zh: '版权所有。', vi: 'Bảo lưu mọi quyền.', id: 'Hak cipta dilindungi.' } as Record<string, string>)[lang] ?? 'All rights reserved.'}</span>
         <a href="#top" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>{t.top} ↑</a>
       </div>
     </footer>
