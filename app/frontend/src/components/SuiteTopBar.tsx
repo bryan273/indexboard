@@ -40,17 +40,26 @@ export const SUITE = FEATURES.map((f) => ({ id: f.id, label: f.en, href: f.href,
 export const EXPLAINER = `${ROOT}/explainer`;
 
 const R = ROOT;
-type Product = { id: string; ids: string[]; href: string; mark: string; en: string; zh: string; hEn: string; hZh: string; chips?: { href: string; en: string; zh: string }[] };
+type L4 = { en: string; zh: string; vi: string; id: string };
+type Product = { id: string; ids: string[]; href: string; mark: string; n: L4; d: L4 };
 /** The suite as three products, not eight apps: make a video, read a paper, check whether its result holds. */
 const PRODUCTS: Product[] = [
-  { id: 'explain', ids: ['explainer'], href: `${R}/explainer/`, mark: '▶', en: 'Explain a paper', zh: '讲解论文', hEn: 'Turn a paper into a short video you can pause, question and quiz yourself on', hZh: '把论文变成可暂停、可提问、可自测的短视频' },
-  { id: 'read', ids: ['companion'], href: `${R}/reading/`, mark: '❝', en: 'Read a paper', zh: '阅读论文', hEn: 'Read an arXiv paper with answers that cite the page', hZh: '阅读 arXiv 论文，答案标注原文页码' },
-  { id: 'repro', ids: ['agent', 'lite', 'desk', 'indexboard', 'hub'], href: `${R}/repro/index.html`, mark: '↻', en: 'Reproduce a paper', zh: '复现论文', hEn: 'An AI agent re-runs the paper\'s experiment and tells you if the result really holds', hZh: 'AI 智能体重新运行论文实验，告诉你结果是否真的成立' },
+  { id: 'explain', ids: ['explainer'], href: `${R}/explainer/`, mark: '▶',
+    n: { en: 'Learn by video', zh: '看视频学论文', vi: 'Học qua video', id: 'Belajar lewat video' },
+    d: { en: 'Drop in a paper or PDF. Get a short video that teaches it.', zh: '丢进论文或 PDF，得到讲解它的短视频。', vi: 'Thả bài báo hoặc PDF vào. Nhận video ngắn giảng giải.', id: 'Masukkan makalah atau PDF. Dapatkan video singkat yang mengajarkannya.' } },
+  { id: 'read', ids: ['companion'], href: `${R}/reading/`, mark: '❝',
+    n: { en: 'Read and ask', zh: '边读边问', vi: 'Đọc và hỏi', id: 'Baca dan tanya' },
+    d: { en: 'Read with an AI that shows the page behind every answer.', zh: '和 AI 一起读，每个答案都标出处页码。', vi: 'Đọc cùng AI chỉ ra trang nguồn của mỗi câu trả lời.', id: 'Baca bersama AI yang menunjukkan halaman di balik setiap jawaban.' } },
+  { id: 'repro', ids: ['agent', 'lite', 'desk', 'indexboard', 'hub'], href: `${R}/repro/index.html`, mark: '✓',
+    n: { en: 'Check the result', zh: '检验结果', vi: 'Kiểm chứng kết quả', id: 'Periksa hasilnya' },
+    d: { en: 'Is the published number true? Our AI re-runs the experiment.', zh: '发表的数字是真的吗？我们的 AI 重新运行实验。', vi: 'Con số được công bố có đúng không? AI của chúng tôi chạy lại thí nghiệm.', id: 'Apakah angka yang dipublikasikan benar? AI kami menjalankan ulang eksperimennya.' } },
 ];
 
 const T = {
-  en: { menu: 'Menu', more: 'More', apps: 'Apps', tools: 'Read · Reproduce', settings: 'Settings', suiteName: 'Three ways to work with a paper', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
-  zh: { menu: '菜单', more: '更多', apps: '应用', tools: '阅读 · 复现', settings: '设置', suiteName: '处理论文的三种方式', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
+  en: { menu: 'Menu', more: 'More', apps: 'Apps', tools: 'More from Paperlit', settings: 'Settings', suiteName: 'What you can do with a paper', toLight: 'Switch to light mode', toDark: 'Switch to dark mode', here: 'this page', onPage: 'On this page' },
+  zh: { menu: '菜单', more: '更多', apps: '应用', tools: 'Paperlit 的更多功能', settings: '设置', suiteName: '你可以用论文做什么', toLight: '切换到浅色模式', toDark: '切换到深色模式', here: '当前页面', onPage: '本页' },
+  vi: { menu: 'Menu', more: 'Thêm', apps: 'Ứng dụng', tools: 'Thêm từ Paperlit', settings: 'Cài đặt', suiteName: 'Bạn có thể làm gì với một bài báo', toLight: 'Chuyển sang giao diện sáng', toDark: 'Chuyển sang giao diện tối', here: 'trang này', onPage: 'Trên trang này' },
+  id: { menu: 'Menu', more: 'Lainnya', apps: 'Aplikasi', tools: 'Lainnya dari Paperlit', settings: 'Pengaturan', suiteName: 'Yang bisa Anda lakukan dengan makalah', toLight: 'Beralih ke tema terang', toDark: 'Beralih ke tema gelap', here: 'halaman ini', onPage: 'Di halaman ini' },
 } as const;
 
 function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
@@ -79,9 +88,12 @@ function NavItem({ l, onDone }: { l: NavLink; onDone: () => void }) {
 }
 
 export default function SuiteTopBar({ appId, brand, letter, nav, lang, onLang, onSettings, languages }: Props) {
-  const t = T[lang === 'zh' ? 'zh' : 'en'];
+  const t = T[lang];
   const zh = lang === 'zh';
   const [langOpen, setLangOpen] = useState(false);
+  const hereFeature = FEATURES.find((f) => f.id === appId);
+  const prodHere = PRODUCTS.find((x) => x.ids.includes(appId));
+  const hereName = appId === 'hub' ? '' : prodHere ? prodHere.n[lang] : brand ?? '';
   const [nudge, setNudge] = useState(() => { try { return localStorage.getItem('stb-tools-seen') !== '1'; } catch { return false; } });
   const seen = () => { setNudge(false); try { localStorage.setItem('stb-tools-seen', '1'); } catch { /* private mode */ } };
   const langRef = useRef<HTMLDivElement>(null);
@@ -121,10 +133,11 @@ export default function SuiteTopBar({ appId, brand, letter, nav, lang, onLang, o
     <>
       <header className="stb" data-open={open} data-sub={hasSub}>
         <div className="stb-row">
-          <a href={hasSub ? '#top' : `${ROOT}/hub/`} className="stb-brand" onClick={() => setOpen(false)}>
-            <span className="stb-logo" aria-hidden>{letter ?? 'R'}</span>
-            <b>{brand ?? 'Repro Suite'}</b>
+          <a href={`${ROOT}/hub/`} className="stb-brand" aria-label="Paperlit" onClick={() => setOpen(false)}>
+            <span className="stb-logo" aria-hidden>P</span>
+            <b>Paperlit</b>
           </a>
+          {hereName && <span className="stb-here" aria-current="page">{hereName}</span>}
 
           {hasSub && (
             <nav className="stb-own" aria-label={t.onPage}>
@@ -148,13 +161,8 @@ export default function SuiteTopBar({ appId, brand, letter, nav, lang, onLang, o
                     <div key={pr.id} className={`stb-prod${pr.ids.includes(active) ? ' on' : ''}`}>
                       <a href={pr.href} role="menuitem" aria-current={pr.ids.includes(active) ? 'page' : undefined}>
                         <span className="stb-tile" aria-hidden>{pr.mark}</span>
-                        <span className="stb-mt"><b>{pr[zh ? 'zh' : 'en']}{pr.ids.includes(active) ? <i> · {t.here}</i> : null}</b><span>{zh ? pr.hZh : pr.hEn}</span></span>
+                        <span className="stb-mt"><b>{pr.n[lang]}{pr.ids.includes(active) ? <i> · {t.here}</i> : null}</b><span>{pr.d[lang]}</span></span>
                       </a>
-                      {pr.chips && (
-                        <div className="stb-chips">
-                          {pr.chips.map((c) => <a key={c.href} href={c.href} role="menuitem">{zh ? c.zh : c.en}</a>)}
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
